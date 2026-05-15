@@ -1,0 +1,11 @@
+node_modules
+dist
+dist-ssr
+build
+coverage
+.vite
+.vitest
+playwright-report
+test-results
+package-lock.json
+*.docx

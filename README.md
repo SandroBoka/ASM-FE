@@ -1,6 +1,8 @@
 # ASM-FE
 
-Frontend application for the FER Information Systems course project, planned as a React + TypeScript solution for the ASM auto service system.
+Frontend application for the FER Information Systems course project, implemented as a React + TypeScript solution for the ASM auto service system.
+
+The project uses Vite for the local development server and production build.
 
 ## Requirements
 
@@ -34,10 +36,17 @@ The Vite development server will print the local application URL, usually:
 http://localhost:5173
 ```
 
+## Available Scripts
+
+```bash
+npm run dev
+npm run build
+npm run lint
+npm run preview
+```
+
 ## Testing
 
 The planned test suite covers the presentation layer, business layer, data access layer, and integration flows that connect the layers.
 
-```bash
-npm test
-```
+The test script will be added during the testing setup step.
