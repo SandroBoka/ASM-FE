@@ -216,6 +216,20 @@ h3 {
     gap: 12px;
 }
 
+.form-actions--end {
+    justify-content: flex-end;
+}
+
+.form-actions--between {
+    justify-content: space-between;
+}
+
+.muted-hint {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 14px;
+}
+
 .form-card__footer {
     margin-top: 20px;
     color: var(--color-text-muted);
@@ -428,4 +442,322 @@ h3 {
     margin-top: 4px;
     padding-top: 10px;
     border-top: 1px solid var(--color-border);
+}
+
+/* ===== Vehicle list - selected state (used in wizard) ===== */
+
+.vehicle-list__item--selected {
+    border-color: var(--color-primary);
+    background: var(--color-primary-soft);
+}
+
+/* ===== Reservation wizard ===== */
+
+.wizard-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+}
+
+.wizard-steps__item {
+    width: 100%;
+    min-width: 110px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+
+.wizard-steps__item:hover:not(:disabled) {
+    background: var(--color-surface-muted);
+}
+
+.wizard-steps__item:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.wizard-steps li {
+    flex: 1;
+    display: flex;
+}
+
+.wizard-steps__item--current {
+    border-color: var(--color-primary);
+    background: var(--color-primary-soft);
+    color: var(--color-primary-hover);
+}
+
+.wizard-steps__item--done {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.wizard-steps__number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--color-surface-muted);
+    color: var(--color-text-muted);
+    font-weight: 800;
+    font-size: 13px;
+}
+
+.wizard-steps__item--current .wizard-steps__number,
+.wizard-steps__item--done .wizard-steps__number {
+    background: var(--color-primary);
+    color: #ffffff;
+}
+
+.wizard-filters {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.wizard-filters .ui-field {
+    flex: 1;
+    min-width: 180px;
+}
+
+/* ===== Appointment selection list ===== */
+
+.appointment-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.appointment-list__item {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+}
+
+.appointment-list__item:hover {
+    background: var(--color-surface-muted);
+}
+
+.appointment-list__item--selected {
+    border-color: var(--color-primary);
+    background: var(--color-primary-soft);
+    color: var(--color-primary-hover);
+}
+
+.appointment-list__date {
+    font-weight: 700;
+}
+
+.appointment-list__time {
+    color: var(--color-text-muted);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.appointment-list__item--selected .appointment-list__time {
+    color: var(--color-primary-hover);
+}
+
+/* ===== Service pick list (wizard step 4) ===== */
+
+.service-pick-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.service-pick-list__item {
+    display: grid;
+    gap: 8px;
+    padding: 12px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+}
+
+.service-pick-list__check {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.service-pick-list__check input {
+    margin-top: 4px;
+}
+
+.service-pick-list__meta {
+    color: var(--color-text-muted);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.service-pick-list__quantity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.service-pick-list__quantity input {
+    max-width: 100px;
+}
+
+/* ===== Summary list ===== */
+
+.summary {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 8px 16px;
+    margin: 0;
+}
+
+.summary dt {
+    color: var(--color-text-muted);
+    font-weight: 600;
+}
+
+.summary dd {
+    margin: 0;
+    color: var(--color-text);
+}
+
+.summary__services {
+    margin: 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 2px;
+}
+
+/* ===== Status pill ===== */
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.status-pill--pending {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fde68a;
+}
+
+.status-pill--approved {
+    background: var(--color-primary-soft);
+    color: var(--color-primary-hover);
+    border-color: #99f6e4;
+}
+
+.status-pill--rejected {
+    background: var(--color-danger-surface);
+    color: var(--color-danger-text);
+    border-color: var(--color-danger-border);
+}
+
+.status-pill--cancelled {
+    background: var(--color-surface-muted);
+    color: var(--color-text-muted);
+    border-color: var(--color-border);
+}
+
+.status-pill--completed {
+    background: #dbeafe;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
+
+/* ===== Reservation list ===== */
+
+.reservation-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+}
+
+.reservation-list__item {
+    display: grid;
+    gap: 10px;
+    padding: 16px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+}
+
+.reservation-list__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.reservation-list__created {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.reservation-list__when {
+    color: var(--color-primary-hover);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.reservation-list__body {
+    display: grid;
+    gap: 6px;
+}
+
+.reservation-list__problem {
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.reservation-list__meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.reservation-list__actions {
+    display: flex;
+    justify-content: flex-end;
 }
