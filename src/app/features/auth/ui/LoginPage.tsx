@@ -1,23 +1,20 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { useAuth } from "./authContext";
+import { useAuth } from "../hooks/useAuth";
 
 function getErrorMessage(error: unknown): string {
     if (error instanceof Error) {
         return error.message;
     }
 
-    return "Registracija nije uspjela.";
+    return "Prijava nije uspjela.";
 }
 
-export function RegisterPage() {
-    const { isAuthenticated, login, registerCustomer } = useAuth();
+export function LoginPage() {
+    const { isAuthenticated, login } = useAuth();
     const navigate = useNavigate();
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
-    const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,19 +29,10 @@ export function RegisterPage() {
         setIsSubmitting(true);
 
         try {
-            await registerCustomer({
-                Ime: firstName,
-                Prezime: lastName,
-                Email: email,
-                Telefon: phone.trim() || null,
-                Lozinka: password,
-            });
-
             await login({
                 Email: email,
                 Lozinka: password,
             });
-
             navigate("/app", { replace: true });
         } catch (error) {
             setErrorMessage(getErrorMessage(error));
@@ -55,29 +43,9 @@ export function RegisterPage() {
 
     return (
         <main>
-            <h1>Registracija korisnika</h1>
+            <h1>Prijava</h1>
 
             <form onSubmit={handleSubmit}>
-                <label>
-                    Ime
-                    <input
-                        type="text"
-                        value={firstName}
-                        onChange={(event) => setFirstName(event.target.value)}
-                        required
-                    />
-                </label>
-
-                <label>
-                    Prezime
-                    <input
-                        type="text"
-                        value={lastName}
-                        onChange={(event) => setLastName(event.target.value)}
-                        required
-                    />
-                </label>
-
                 <label>
                     Email
                     <input
@@ -85,15 +53,6 @@ export function RegisterPage() {
                         value={email}
                         onChange={(event) => setEmail(event.target.value)}
                         required
-                    />
-                </label>
-
-                <label>
-                    Telefon
-                    <input
-                        type="tel"
-                        value={phone}
-                        onChange={(event) => setPhone(event.target.value)}
                     />
                 </label>
 
@@ -110,12 +69,12 @@ export function RegisterPage() {
                 {errorMessage ? <p role="alert">{errorMessage}</p> : null}
 
                 <button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Registracija u tijeku..." : "Registriraj se"}
+                    {isSubmitting ? "Prijava u tijeku..." : "Prijavi se"}
                 </button>
             </form>
 
             <p>
-                Već imaš račun? <Link to="/login">Prijavi se</Link>
+                Nemaš račun? <Link to="/register">Registriraj se</Link>
             </p>
         </main>
     );

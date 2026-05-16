@@ -1,5 +1,5 @@
 import { Navigate, useNavigate } from "react-router-dom";
-import { useAuth } from "../auth/authContext";
+import { useAuth } from "../auth/hooks/useAuth";
 
 export function HomePage() {
     const { isAuthenticated, logout, user } = useAuth();

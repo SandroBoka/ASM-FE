@@ -34,10 +34,11 @@ npm install
 
 ## Environment
 
-Create a `.env` file in the project root:
+Create a `.env.local` file in the project root:
 
 ```env
 VITE_API_BASE_URL=http://127.0.0.1:8000
+VITE_APP_LOCALE=hr
 ```
 
 ## Running the Application
@@ -148,7 +149,7 @@ The HTTP client:
 Public requests can opt out of authentication with:
 
 ```ts
-authenticated: false
+authenticated: false;
 ```
 
 ## Formatting And Checks

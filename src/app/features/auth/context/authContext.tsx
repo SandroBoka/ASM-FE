@@ -1,14 +1,14 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import type {
     AuthUser,
     CustomerResponse,
     LoginRequest,
     RegisterCustomerRequest,
-} from "./authTypes";
-import * as authService from "../../services/authService";
+} from "../models/authTypes";
+import * as authService from "../../../services/authService";
 
-type AuthContextValue = {
+export type AuthContextValue = {
     user: AuthUser | null;
     isAuthenticated: boolean;
     login: (request: LoginRequest) => Promise<void>;
@@ -16,7 +16,8 @@ type AuthContextValue = {
     logout: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+// eslint-disable-next-line react-refresh/only-export-components
+export const AuthContext = createContext<AuthContextValue | null>(null);
 
 type AuthProviderProps = {
     children: ReactNode;
@@ -53,14 +54,4 @@ export function AuthProvider({ children }: AuthProviderProps) {
     );
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth(): AuthContextValue {
-    const value = useContext(AuthContext);
-
-    if (!value) {
-        throw new Error("useAuth se mora koristiti unutar AuthProvider.");
-    }
-
-    return value;
 }

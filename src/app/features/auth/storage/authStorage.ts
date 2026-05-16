@@ -1,4 +1,4 @@
-import type { AuthTokenResponse, AuthUser } from "./authTypes";
+import type { AuthTokenResponse, AuthUser } from "../models/authTypes";
 
 const AUTH_SESSION_KEY = "asm_auth_session";
 

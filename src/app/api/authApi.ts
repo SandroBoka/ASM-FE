@@ -5,7 +5,7 @@ import type {
     LoginRequest,
     LogoutRequest,
     RegisterCustomerRequest,
-} from "../features/auth/authTypes";
+} from "../features/auth/models/authTypes";
 import { httpClient } from "./httpClient";
 
 export function login(request: LoginRequest): Promise<AuthTokenResponse> {

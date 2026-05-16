@@ -4,8 +4,8 @@ import {
     getAuthSession,
     isAuthSessionExpired,
     saveAuthSession,
-} from "../features/auth/authStorage";
-import type { AuthTokenResponse } from "../features/auth/authTypes";
+} from "../features/auth/storage/authStorage";
+import type { AuthTokenResponse } from "../features/auth/models/authTypes";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000";
 
