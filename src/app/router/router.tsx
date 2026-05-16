@@ -1,7 +1,9 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { LoginPage } from "../features/auth/ui/LoginPage";
 import { RegisterPage } from "../features/auth/ui/RegisterPage";
 import { HomePage } from "../features/home/HomePage";
+import { AppLayout } from "./AppLayout";
+import { GuestRoute, ProtectedRoute } from "./AuthRoutes";
 import {
     EditReservationPagePlaceholder,
     NewReservationPagePlaceholder,
@@ -9,17 +11,8 @@ import {
     ServicesPagePlaceholder,
     VehiclesPagePlaceholder,
 } from "./routePlaceholders";
-import { GuestRoute, ProtectedRoute } from "./AuthRoutes";
 
 export const router = createBrowserRouter([
-    {
-        path: "/",
-        element: (
-            <ProtectedRoute>
-                <HomePage />
-            </ProtectedRoute>
-        ),
-    },
     {
         path: "/login",
         element: (
@@ -37,43 +30,40 @@ export const router = createBrowserRouter([
         ),
     },
     {
-        path: "/services",
-        element: (
-            <ProtectedRoute>
-                <ServicesPagePlaceholder />
-            </ProtectedRoute>
-        ),
+        path: "/",
+        element: <ProtectedRoute />,
+        children: [
+            {
+                element: <AppLayout />,
+                children: [
+                    { index: true, element: <HomePage /> },
+                    { path: "services", element: <ServicesPagePlaceholder /> },
+                    { path: "vehicles", element: <VehiclesPagePlaceholder /> },
+                    { path: "reservations", element: <ReservationsPagePlaceholder /> },
+                    { path: "reservations/new", element: <NewReservationPagePlaceholder /> },
+                    {
+                        path: "reservations/:reservationId",
+                        element: <EditReservationPagePlaceholder />,
+                    },
+                    {
+                        element: <ProtectedRoute requiredUserType="employee" />,
+                        children: [
+                            {
+                                path: "pending-reservations",
+                                element: <h1>Pending zahtjevi (placeholder)</h1>,
+                            },
+                            {
+                                path: "pending-changes",
+                                element: <h1>Promjene termina (placeholder)</h1>,
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
     },
     {
-        path: "/vehicles",
-        element: (
-            <ProtectedRoute>
-                <VehiclesPagePlaceholder />
-            </ProtectedRoute>
-        ),
-    },
-    {
-        path: "/reservations",
-        element: (
-            <ProtectedRoute>
-                <ReservationsPagePlaceholder />
-            </ProtectedRoute>
-        ),
-    },
-    {
-        path: "/reservations/new",
-        element: (
-            <ProtectedRoute>
-                <NewReservationPagePlaceholder />
-            </ProtectedRoute>
-        ),
-    },
-    {
-        path: "/reservations/:reservationId",
-        element: (
-            <ProtectedRoute>
-                <EditReservationPagePlaceholder />
-            </ProtectedRoute>
-        ),
+        path: "*",
+        element: <Navigate to="/" replace />,
     },
 ]);
