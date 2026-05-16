@@ -1,10 +1,10 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import { LoginPage } from "../features/auth/LoginPage";
+import { RegisterPage } from "../features/auth/RegisterPage";
+import { HomePage } from "../features/home/HomePage";
 import {
     EditReservationPagePlaceholder,
-    HomePagePlaceholder,
-    LoginPagePlaceholder,
     NewReservationPagePlaceholder,
-    RegisterPagePlaceholder,
     ReservationsPagePlaceholder,
     ServicesPagePlaceholder,
     VehiclesPagePlaceholder,
@@ -17,15 +17,15 @@ export const router = createBrowserRouter([
     },
     {
         path: "/login",
-        element: <LoginPagePlaceholder />,
+        element: <LoginPage />,
     },
     {
         path: "/register",
-        element: <RegisterPagePlaceholder />,
+        element: <RegisterPage />,
     },
     {
         path: "/app",
-        element: <HomePagePlaceholder />,
+        element: <HomePage />,
     },
     {
         path: "/app/services",
