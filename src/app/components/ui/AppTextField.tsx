@@ -4,7 +4,7 @@ type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
     label: string;
 };
 
-export function TextField({ id, label, name, ...props }: TextFieldProps) {
+export function AppTextField({ id, label, name, ...props }: TextFieldProps) {
     const inputId = id ?? name;
 
     return (

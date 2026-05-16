@@ -10,7 +10,7 @@ type ButtonProps = {
     variant?: ButtonVariant;
 };
 
-export function Button({
+export function AppButton({
     children,
     disabled = false,
     onClick,

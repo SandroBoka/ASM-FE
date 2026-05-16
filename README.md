@@ -73,52 +73,84 @@ npm run preview
 
 ## Application Architecture
 
-The application is being built around a layered architecture:
+The frontend uses **Vertical Slice Architecture**.
+
+The application is organized around business features instead of global technical layers. Each feature owns the code needed for that part of the system, such as UI, models, API calls, services, storage, hooks, and validation. Shared infrastructure stays outside feature folders.
+
+Current high-level structure:
 
 ```txt
-presentation / React UI
-  -> application services and context
-      -> API adapters
-          -> HTTP client
-              -> ASM backend
+src/app/
+  api/                 shared HTTP infrastructure
+  components/ui/       reusable UI components
+  features/            vertical feature slices
+  localization/        i18next setup
+  router/              route definitions and route guards
+  App.tsx              provider composition and router mounting
+  main.tsx             React entry point
+  styles.css           global styles and design tokens
 ```
 
-Current foundations:
+Current feature slices:
 
-- `AppProviders` wires global providers.
-- `RouterProvider` defines application routes.
-- `QueryClientProvider` prepares TanStack Query for server-state features.
+```txt
+features/auth/
+  api/                 auth backend calls
+  context/             auth provider and context
+  hooks/               auth React hooks
+  models/              auth DTO and user types
+  service/             auth application flow
+  storage/             local auth session storage
+  ui/                  login and registration pages
+
+features/home/
+  HomePage.tsx         temporary protected home screen
+```
+
+Shared infrastructure:
+
+- `App.tsx` composes `QueryClientProvider`, `AuthProvider`, and `RouterProvider`.
+- `router` defines public and protected routes.
+- `AuthRoutes` centralizes route protection through `ProtectedRoute` and `GuestRoute`.
 - `httpClient` centralizes backend communication.
-- `authApi` contains authentication-related backend endpoint calls.
-- `authService` coordinates authentication flow between API calls and local session storage.
-- `authStorage` stores the authentication session in `localStorage`.
-- `authContext` exposes authentication state and actions to React components.
+- `localization/i18n` configures Croatian and English UI text.
+- `components/ui` contains reusable form and feedback components.
+
+Planned business slices:
+
+```txt
+features/services/       service catalog / sifrarnik usluga
+features/reservations/   reservation master-detail screen
+features/vehicles/       vehicle-related UI and dropdown data
+```
 
 ## Folder Responsibilities
 
-The `src/app` folder contains the application shell. It owns the root React entry point, the top-level `App` component, global providers, routing, API adapters, application services, and feature folders.
+The `src/app` folder contains the frontend application. It owns the React entry point, application composition, routing, shared infrastructure, global styles, localization, reusable UI components, and feature slices.
 
-The `src/app/api` folder contains backend-facing API adapters. `httpClient` centralizes low-level HTTP behavior, while endpoint-specific modules such as `authApi` describe concrete backend calls. React components should not call `fetch` directly.
+The `src/app/api` folder contains shared backend infrastructure. `httpClient` centralizes low-level HTTP behavior. Feature-specific API modules live inside their feature slices, for example `features/auth/api/authApi.ts`.
 
-The `src/app/features` folder contains feature-oriented UI and feature-local code. The current auth feature owns authentication types, local session storage helpers, React auth context, and temporary screens used to verify the authentication flow.
+The `src/app/components/ui` folder contains reusable visual components such as buttons, text fields, alerts, and form layout components. These components do not own business logic.
 
-The `src/app/providers` folder contains global provider composition. This is where app-wide tools such as TanStack Query, authentication context, and router provider are connected.
+The `src/app/features` folder contains vertical slices. Each feature should keep its related UI, models, services, API adapters, hooks, storage, repositories, and validation close together.
 
-The `src/app/router` folder contains route configuration. It maps URLs to feature pages and still contains placeholder routes for features that have not been implemented yet.
+The `src/app/localization` folder contains i18next configuration and translation resources. The default locale is Croatian.
 
-The `src/app/services` folder contains application services that coordinate higher-level flows. For example, `authService` connects auth API calls with session creation, session storage, and logout cleanup.
+The `src/app/router` folder contains route configuration and route guards. Protected application routes require an authenticated user, while login and registration are guest routes.
 
-The `src/tests` folder contains Vitest setup and application tests. Test setup loads Testing Library matchers for DOM assertions.
+The `src/tests` folder mirrors important parts of the application structure and contains Vitest tests, test utilities, and global test setup.
 
 ## Authentication Flow
 
-Authentication is split across several small layers:
+Implementation:
 
-- `authApi` sends login, logout, current-user, and registration requests to the backend.
-- `authService` coordinates login, registration, logout, session creation, and session cleanup.
-- `authStorage` stores the current auth session in `localStorage`.
-- `authContext` exposes the current user and auth actions to React components through `useAuth`.
-- `httpClient` attaches access tokens, refreshes expired sessions, retries authenticated requests once after `401`, and clears the session when refresh fails.
+- `features/auth/api/authApi.ts` sends login, logout, current-user, and registration requests to the backend.
+- `features/auth/service/authService.ts` coordinates login, registration, logout, session creation, and session cleanup.
+- `features/auth/storage/authStorage.ts` stores the current auth session in `localStorage`.
+- `features/auth/context/authContext.tsx` exposes the current user and auth actions through `AuthProvider`.
+- `features/auth/hooks/useAuth.ts` provides a small hook for consuming auth context.
+- `features/auth/ui/LoginPage.tsx` and `RegisterPage.tsx` contain the current auth screens.
+- `api/httpClient.ts` attaches access tokens, refreshes expired sessions, retries authenticated requests once after `401`, and clears the session when refresh fails.
 
 Backend routes currently used by the frontend auth foundation:
 
@@ -175,7 +207,18 @@ Current test setup:
 
 ```txt
 src/tests/setupTests.ts
-src/tests/app.test.tsx
+src/tests/testUtils/renderAuthPage.tsx
+src/tests/app/features/auth/ui/LoginPage.test.tsx
+src/tests/app/features/auth/ui/RegisterPage.test.tsx
 ```
 
-The planned test suite will cover the presentation layer, business/application layer, data access layer, and integration flows that connect the layers.
+The test folder mirrors application structure where useful. Current auth tests cover login and registration UI behavior using a mocked auth context.
+
+Planned tests for business features:
+
+- presentation tests for pages, forms, and controllers
+- business logic tests for services, use cases, and validation rules
+- data access tests for API adapters, repositories, and local storage adapters
+- integration tests proving that feature UI, business logic, and data access are connected
+
+Even though the frontend uses Vertical Slice Architecture, each business slice should still expose testable presentation, business, and data-access responsibilities.

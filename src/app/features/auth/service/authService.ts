@@ -6,13 +6,13 @@ import {
     getStoredUser,
     hasValidAuthSession,
     saveAuthSession,
-} from "../features/auth/storage/authStorage";
+} from "../storage/authStorage";
 import type {
     AuthUser,
     CustomerResponse,
     LoginRequest,
     RegisterCustomerRequest,
-} from "../features/auth/models/authTypes";
+} from "../models/authTypes";
 
 export async function login(request: LoginRequest): Promise<AuthUser> {
     const response = await authApi.login(request);

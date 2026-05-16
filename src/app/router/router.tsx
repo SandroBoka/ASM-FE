@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import { LoginPage } from "../features/auth/ui/LoginPage";
 import { RegisterPage } from "../features/auth/ui/RegisterPage";
 import { HomePage } from "../features/home/HomePage";
@@ -9,42 +9,71 @@ import {
     ServicesPagePlaceholder,
     VehiclesPagePlaceholder,
 } from "./routePlaceholders";
+import { GuestRoute, ProtectedRoute } from "./AuthRoutes";
 
 export const router = createBrowserRouter([
     {
         path: "/",
-        element: <Navigate to="/app" replace />,
+        element: (
+            <ProtectedRoute>
+                <HomePage />
+            </ProtectedRoute>
+        ),
     },
     {
         path: "/login",
-        element: <LoginPage />,
+        element: (
+            <GuestRoute>
+                <LoginPage />
+            </GuestRoute>
+        ),
     },
     {
         path: "/register",
-        element: <RegisterPage />,
+        element: (
+            <GuestRoute>
+                <RegisterPage />
+            </GuestRoute>
+        ),
     },
     {
-        path: "/app",
-        element: <HomePage />,
+        path: "/services",
+        element: (
+            <ProtectedRoute>
+                <ServicesPagePlaceholder />
+            </ProtectedRoute>
+        ),
     },
     {
-        path: "/app/services",
-        element: <ServicesPagePlaceholder />,
+        path: "/vehicles",
+        element: (
+            <ProtectedRoute>
+                <VehiclesPagePlaceholder />
+            </ProtectedRoute>
+        ),
     },
     {
-        path: "/app/vehicles",
-        element: <VehiclesPagePlaceholder />,
+        path: "/reservations",
+        element: (
+            <ProtectedRoute>
+                <ReservationsPagePlaceholder />
+            </ProtectedRoute>
+        ),
     },
     {
-        path: "/app/reservations",
-        element: <ReservationsPagePlaceholder />,
+        path: "/reservations/new",
+        element: (
+            <ProtectedRoute>
+                <NewReservationPagePlaceholder />
+            </ProtectedRoute>
+        ),
     },
     {
-        path: "/app/reservations/new",
-        element: <NewReservationPagePlaceholder />,
-    },
-    {
-        path: "/app/reservations/:reservationId",
-        element: <EditReservationPagePlaceholder />,
+        path: "/reservations/:reservationId",
+        element: (
+            <ProtectedRoute>
+                <EditReservationPagePlaceholder />
+            </ProtectedRoute>
+        ),
     },
 ]);

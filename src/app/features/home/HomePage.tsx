@@ -2,10 +2,10 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/hooks/useAuth";
 
 export function HomePage() {
-    const { isAuthenticated, logout, user } = useAuth();
+    const { logout, user } = useAuth();
     const navigate = useNavigate();
 
-    if (!isAuthenticated || !user) {
+    if (!user) {
         return <Navigate to="/login" replace />;
     }
 

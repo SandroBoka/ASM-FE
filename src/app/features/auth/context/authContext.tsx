@@ -6,7 +6,7 @@ import type {
     LoginRequest,
     RegisterCustomerRequest,
 } from "../models/authTypes";
-import * as authService from "../../../services/authService";
+import * as authService from "../service/authService";
 
 export type AuthContextValue = {
     user: AuthUser | null;

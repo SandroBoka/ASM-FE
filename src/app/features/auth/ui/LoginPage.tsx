@@ -1,29 +1,31 @@
 import { useState } from "react";
-import type { FormEvent } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import type { BaseSyntheticEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { Alert } from "../../../components/ui/Alert";
+import { AppTextField } from "../../../components/ui/AppTextField";
 import { useAuth } from "../hooks/useAuth";
+import { FormLayout } from "../../../components/ui/FormLayout";
+import { AppButton } from "../../../components/ui/AppButton";
 
-function getErrorMessage(error: unknown): string {
+function getErrorMessage(error: unknown, fallbackMessage: string): string {
     if (error instanceof Error) {
         return error.message;
     }
 
-    return "Prijava nije uspjela.";
+    return fallbackMessage;
 }
 
 export function LoginPage() {
-    const { isAuthenticated, login } = useAuth();
+    const { login } = useAuth();
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    if (isAuthenticated) {
-        return <Navigate to="/app" replace />;
-    }
-
-    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: BaseSyntheticEvent<SubmitEvent, HTMLFormElement>) {
         event.preventDefault();
         setErrorMessage(null);
         setIsSubmitting(true);
@@ -33,49 +35,49 @@ export function LoginPage() {
                 Email: email,
                 Lozinka: password,
             });
-            navigate("/app", { replace: true });
+            navigate("/", { replace: true });
         } catch (error) {
-            setErrorMessage(getErrorMessage(error));
+            setErrorMessage(getErrorMessage(error, t("auth.loginFailed")));
         } finally {
             setIsSubmitting(false);
         }
     }
 
     return (
-        <main>
-            <h1>Prijava</h1>
+        <FormLayout
+            title={t("auth.login")}
+            subtitle={t("auth.loginSubtitle")}
+            footer={
+                <p>
+                    {t("auth.noAccount")} <Link to="/register">{t("auth.registerAction")}</Link>
+                </p>
+            }
+        >
+            <form className="form" onSubmit={handleSubmit}>
+                <AppTextField
+                    label={t("auth.email")}
+                    name="email"
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    required
+                />
 
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Email
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(event) => setEmail(event.target.value)}
-                        required
-                    />
-                </label>
+                <AppTextField
+                    label={t("auth.password")}
+                    name="password"
+                    type="password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    required
+                />
 
-                <label>
-                    Lozinka
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(event) => setPassword(event.target.value)}
-                        required
-                    />
-                </label>
+                {errorMessage ? <Alert variant="error">{errorMessage}</Alert> : null}
 
-                {errorMessage ? <p role="alert">{errorMessage}</p> : null}
-
-                <button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Prijava u tijeku..." : "Prijavi se"}
-                </button>
+                <AppButton type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? t("auth.loginPending") : t("auth.loginAction")}
+                </AppButton>
             </form>
-
-            <p>
-                Nemaš račun? <Link to="/register">Registriraj se</Link>
-            </p>
-        </main>
+        </FormLayout>
     );
 }
