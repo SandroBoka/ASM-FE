@@ -22,13 +22,18 @@
     --color-text-muted: #667085;
     --color-primary: #0f766e;
     --color-primary-hover: #115e59;
+    --color-primary-soft: #ccfbf1;
     --color-danger-surface: #fef2f2;
     --color-danger-border: #fecaca;
     --color-danger-text: #991b1b;
 
     --shadow-soft: 0 18px 45px rgb(15 23 42 / 10%);
+    --shadow-subtle: 0 4px 12px rgb(15 23 42 / 6%);
     --radius-sm: 6px;
     --radius-md: 8px;
+    --radius-lg: 12px;
+
+    --content-max-width: 960px;
 }
 
 * {
@@ -60,6 +65,15 @@ a:hover {
     text-decoration: underline;
 }
 
+h1,
+h2,
+h3 {
+    margin: 0;
+    color: var(--color-text);
+}
+
+/* ===== UI primitives ===== */
+
 .ui-button {
     min-height: 40px;
     border: 1px solid transparent;
@@ -85,15 +99,27 @@ a:hover {
     color: #ffffff;
 }
 
+.ui-button--primary:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+}
+
 .ui-button--secondary:not(:disabled) {
     background: var(--color-surface);
     border-color: var(--color-border);
     color: var(--color-text);
 }
 
+.ui-button--secondary:hover:not(:disabled) {
+    background: var(--color-surface-muted);
+}
+
 .ui-button--destructive:not(:disabled) {
     background: var(--color-danger-text);
     color: #ffffff;
+}
+
+.ui-button--destructive:hover:not(:disabled) {
+    background: #7f1d1d;
 }
 
 .ui-field {
@@ -115,6 +141,12 @@ a:hover {
     background: var(--color-surface);
     color: var(--color-text);
     padding: 0 12px;
+}
+
+.ui-field__input:focus {
+    outline: 2px solid var(--color-primary-soft);
+    outline-offset: 1px;
+    border-color: var(--color-primary);
 }
 
 .ui-field__input:disabled {
@@ -140,6 +172,8 @@ a:hover {
     color: var(--color-danger-text);
 }
 
+/* ===== Centered auth forms (login/register) ===== */
+
 .form-page {
     display: grid;
     min-height: 100vh;
@@ -163,8 +197,6 @@ a:hover {
 }
 
 .form-card__header h1 {
-    margin: 0;
-    color: var(--color-text);
     font-size: 28px;
     line-height: 1.2;
 }
@@ -179,6 +211,11 @@ a:hover {
     gap: 16px;
 }
 
+.form-actions {
+    display: flex;
+    gap: 12px;
+}
+
 .form-card__footer {
     margin-top: 20px;
     color: var(--color-text-muted);
@@ -187,4 +224,146 @@ a:hover {
 
 .form-card__footer p {
     margin: 0;
+}
+
+/* ===== App shell (header + content for logged-in routes) ===== */
+
+.app-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-shell__header {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 14px 24px;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: var(--shadow-subtle);
+}
+
+.app-shell__brand {
+    font-weight: 800;
+    color: var(--color-primary);
+    font-size: 18px;
+    white-space: nowrap;
+}
+
+.app-shell__nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+
+.app-shell__nav a {
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-weight: 600;
+}
+
+.app-shell__nav a:hover {
+    background: var(--color-surface-muted);
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+.app-shell__nav a.active {
+    background: var(--color-primary-soft);
+    color: var(--color-primary-hover);
+}
+
+.app-shell__user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--color-text-muted);
+}
+
+.app-shell__user button {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.app-shell__user button:hover {
+    background: var(--color-surface-muted);
+}
+
+.app-shell__main {
+    flex: 1;
+    width: 100%;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: 24px;
+}
+
+/* ===== Generic page layout ===== */
+
+.page {
+    display: grid;
+    gap: 24px;
+}
+
+.page__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.page__header h1 {
+    font-size: 24px;
+}
+
+.page__section {
+    display: grid;
+    gap: 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-subtle);
+    padding: 20px;
+}
+
+.page__section h2 {
+    font-size: 18px;
+}
+
+/* ===== Vehicle list ===== */
+
+.vehicle-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+}
+
+.vehicle-list__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+}
+
+.vehicle-list__item strong {
+    color: var(--color-text);
+    font-size: 16px;
+}
+
+.vehicle-list__item > div:last-child {
+    display: flex;
+    gap: 8px;
 }

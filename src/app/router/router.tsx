@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { LoginPage } from "../features/auth/ui/LoginPage";
 import { RegisterPage } from "../features/auth/ui/RegisterPage";
 import { HomePage } from "../features/home/HomePage";
+import { VehiclesPage } from "../features/vehicles/ui/VehiclesPage";
 import { AppLayout } from "./AppLayout";
 import { GuestRoute, ProtectedRoute } from "./AuthRoutes";
 import {
@@ -9,7 +10,6 @@ import {
     NewReservationPagePlaceholder,
     ReservationsPagePlaceholder,
     ServicesPagePlaceholder,
-    VehiclesPagePlaceholder,
 } from "./routePlaceholders";
 
 export const router = createBrowserRouter([
@@ -38,7 +38,7 @@ export const router = createBrowserRouter([
                 children: [
                     { index: true, element: <HomePage /> },
                     { path: "services", element: <ServicesPagePlaceholder /> },
-                    { path: "vehicles", element: <VehiclesPagePlaceholder /> },
+                    { path: "vehicles", element: <VehiclesPage /> },
                     { path: "reservations", element: <ReservationsPagePlaceholder /> },
                     { path: "reservations/new", element: <NewReservationPagePlaceholder /> },
                     {
