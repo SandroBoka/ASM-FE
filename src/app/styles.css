@@ -367,3 +367,65 @@ h3 {
     display: flex;
     gap: 8px;
 }
+
+/* ===== Service list ===== */
+
+.service-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+}
+
+.service-list__item {
+    display: grid;
+    gap: 10px;
+    padding: 16px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+}
+
+.service-list__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.service-list__name {
+    font-size: 16px;
+    color: var(--color-text);
+}
+
+.service-list__price {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-primary);
+    white-space: nowrap;
+}
+
+.service-list__description {
+    margin: 0;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+}
+
+.service-list__duration {
+    justify-self: start;
+    background: var(--color-surface-muted);
+    color: var(--color-text-muted);
+    font-weight: 600;
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.service-list__actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-border);
+}
