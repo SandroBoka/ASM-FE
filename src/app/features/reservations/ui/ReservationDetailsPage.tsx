@@ -291,10 +291,7 @@ export function ReservationDetailsPage() {
             {canProposeChange ? (
                 <section className="page__section">
                     <h2>{t("appointmentChanges.proposeTitle")}</h2>
-                    <ProposeChangeSection
-                        reservationId={reservation.IdRezervacije}
-                        currentAppointmentId={reservation.IdTermina}
-                    />
+                    <ProposeChangeSection reservation={reservation} />
                 </section>
             ) : null}
 

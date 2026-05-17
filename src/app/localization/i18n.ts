@@ -13,6 +13,7 @@ const resources = {
                 pendingReservations: "Pending zahtjevi",
                 pendingChanges: "Promjene termina",
                 adminAppointments: "Termini",
+                notifications: "Obavijesti",
                 user: "Prijavljeni korisnik",
                 logout: "Odjavi se",
                 logoutPending: "Odjava u tijeku...",
@@ -217,6 +218,12 @@ const resources = {
                     timeRangeInvalid: "Vrijeme \"do\" mora biti veće od vremena \"od\".",
                 },
             },
+            notifications: {
+                title: "Obavijesti",
+                empty: "Nemaš obavijesti.",
+                customerOnly: "Obavijesti su dostupne samo korisnicima.",
+                viewReservation: "Otvori rezervaciju →",
+            },
             adminAppointments: {
                 title: "Termini",
                 listTitle: "Popis termina",
@@ -245,6 +252,7 @@ const resources = {
                 pendingReservations: "Pending requests",
                 pendingChanges: "Appointment changes",
                 adminAppointments: "Appointments",
+                notifications: "Notifications",
                 user: "Signed-in user",
                 logout: "Sign out",
                 logoutPending: "Signing out...",
@@ -445,6 +453,12 @@ const resources = {
                     missingFields: "All fields are required.",
                     timeRangeInvalid: "End time must be after start time.",
                 },
+            },
+            notifications: {
+                title: "Notifications",
+                empty: "You have no notifications.",
+                customerOnly: "Notifications are available to customers only.",
+                viewReservation: "Open reservation →",
             },
             adminAppointments: {
                 title: "Appointments",

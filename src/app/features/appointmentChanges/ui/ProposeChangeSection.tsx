@@ -4,6 +4,7 @@ import { Alert } from "../../../components/ui/Alert";
 import { AppButton } from "../../../components/ui/AppButton";
 import { AppTextField } from "../../../components/ui/AppTextField";
 import { useFreeAppointments } from "../../appointments/hooks/useAppointments";
+import type { Reservation } from "../../reservations/models/reservationTypes";
 import { useCreateAppointmentChange } from "../hooks/useAppointmentChanges";
 
 function toIsoDate(date: Date): string {
@@ -20,6 +21,12 @@ function formatTimeRange(from: string, to: string): string {
     return `${from.slice(0, 5)}–${to.slice(0, 5)}`;
 }
 
+function durationInMinutes(from: string, to: string): number {
+    const [fromHours, fromMinutes] = from.split(":").map(Number);
+    const [toHours, toMinutes] = to.split(":").map(Number);
+    return toHours * 60 + toMinutes - (fromHours * 60 + fromMinutes);
+}
+
 function getErrorMessage(error: unknown, fallback: string): string {
     if (error instanceof Error) {
         return error.message;
@@ -28,11 +35,16 @@ function getErrorMessage(error: unknown, fallback: string): string {
 }
 
 type Props = {
-    reservationId: number;
-    currentAppointmentId: number;
+    reservation: Reservation;
 };
 
-export function ProposeChangeSection({ reservationId, currentAppointmentId }: Props) {
+export function ProposeChangeSection({ reservation }: Props) {
+    const reservationId = reservation.IdRezervacije;
+    const currentAppointmentId = reservation.IdTermina;
+    const totalServiceDuration = reservation.services.reduce(
+        (sum, item) => sum + item.service.Trajanje * item.Kolicina,
+        0,
+    );
     const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const today = useMemo(() => toIsoDate(new Date()), []);
@@ -75,6 +87,17 @@ export function ProposeChangeSection({ reservationId, currentAppointmentId }: Pr
     const availableAppointments = (appointmentsQuery.data ?? []).filter(
         (a) => a.IdTermina !== currentAppointmentId,
     );
+
+    const selectedAppointment = availableAppointments.find(
+        (a) => a.IdTermina === selectedAppointmentId,
+    );
+    const selectedSlotDuration = selectedAppointment
+        ? durationInMinutes(selectedAppointment.VrijemeOd, selectedAppointment.VrijemeDo)
+        : null;
+    const exceedsSlot =
+        selectedSlotDuration !== null &&
+        totalServiceDuration > 0 &&
+        totalServiceDuration > selectedSlotDuration;
 
     return (
         <div className="propose-change">
@@ -140,6 +163,15 @@ export function ProposeChangeSection({ reservationId, currentAppointmentId }: Pr
                 </ul>
             ) : null}
 
+            {exceedsSlot && selectedSlotDuration !== null ? (
+                <Alert variant="error">
+                    {t("reservations.validation.durationExceedsSlot", {
+                        total: totalServiceDuration,
+                        slot: selectedSlotDuration,
+                    })}
+                </Alert>
+            ) : null}
+
             {createMutation.error ? (
                 <Alert variant="error">
                     {getErrorMessage(createMutation.error, t("common.unknownError"))}
@@ -149,7 +181,11 @@ export function ProposeChangeSection({ reservationId, currentAppointmentId }: Pr
             <div className="form-actions">
                 <AppButton
                     onClick={handleSubmit}
-                    disabled={selectedAppointmentId === null || createMutation.isPending}
+                    disabled={
+                        selectedAppointmentId === null ||
+                        createMutation.isPending ||
+                        exceedsSlot
+                    }
                 >
                     {createMutation.isPending
                         ? t("appointmentChanges.sendingRequest")

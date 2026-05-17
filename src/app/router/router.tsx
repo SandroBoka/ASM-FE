@@ -3,6 +3,7 @@ import { LoginPage } from "../features/auth/ui/LoginPage";
 import { RegisterPage } from "../features/auth/ui/RegisterPage";
 import { HomePage } from "../features/home/HomePage";
 import { AdminAppointmentsPage } from "../features/appointments/ui/AdminAppointmentsPage";
+import { NotificationsPage } from "../features/notifications/ui/NotificationsPage";
 import { NewReservationPage } from "../features/reservations/ui/NewReservationPage";
 import { PendingReservationsPage } from "../features/reservations/ui/PendingReservationsPage";
 import { ReservationDetailsPage } from "../features/reservations/ui/ReservationDetailsPage";
@@ -38,6 +39,12 @@ export const router = createBrowserRouter([
                 children: [
                     { index: true, element: <HomePage /> },
                     { path: "services", element: <ServicesPage /> },
+                    {
+                        element: <ProtectedRoute requiredUserType="customer" />,
+                        children: [
+                            { path: "notifications", element: <NotificationsPage /> },
+                        ],
+                    },
                     { path: "vehicles", element: <VehiclesPage /> },
                     { path: "reservations", element: <ReservationsPage /> },
                     { path: "reservations/new", element: <NewReservationPage /> },

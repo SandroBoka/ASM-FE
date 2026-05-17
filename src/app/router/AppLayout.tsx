@@ -1,11 +1,36 @@
+import { useQuery } from "@tanstack/react-query";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import * as appointmentChangesApi from "../features/appointmentChanges/api/appointmentChangesApi";
 import { useAuth } from "../features/auth/hooks/useAuth";
+import { useUnreadNotifications } from "../features/notifications/hooks/useNotifications";
+import * as reservationsApi from "../features/reservations/api/reservationsApi";
 
 export function AppLayout() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const isCustomer = user?.TipKorisnika === "customer";
+    const isEmployeeFlag = user?.TipKorisnika === "employee";
+
+    const unreadQuery = useUnreadNotifications(isCustomer);
+    const unreadCount = unreadQuery.data?.length ?? 0;
+
+    const pendingReservationsQuery = useQuery({
+        queryKey: ["reservations", "pending"],
+        queryFn: () => reservationsApi.getPendingReservations(),
+        enabled: isEmployeeFlag,
+        refetchInterval: 10_000,
+    });
+    const pendingChangesQuery = useQuery({
+        queryKey: ["appointment-changes", "pending"],
+        queryFn: () => appointmentChangesApi.getPendingChanges(),
+        enabled: isEmployeeFlag,
+        refetchInterval: 10_000,
+    });
+    const pendingCount =
+        (pendingReservationsQuery.data?.length ?? 0) +
+        (pendingChangesQuery.data?.length ?? 0);
 
     if (!user) {
         return null;
@@ -33,10 +58,25 @@ export function AppLayout() {
                     <NavLink to="/reservations">{t("app.reservations")}</NavLink>
                     <NavLink to="/services">{t("app.services")}</NavLink>
 
+                    {isCustomer && (
+                        <NavLink to="/notifications" className="app-shell__nav-with-badge">
+                            <span>{t("app.notifications")}</span>
+                            {unreadCount > 0 ? (
+                                <span className="nav-badge">{unreadCount}</span>
+                            ) : null}
+                        </NavLink>
+                    )}
+
                     {isEmployee && (
                         <>
-                            <NavLink to="/pending-reservations">
-                                {t("app.pendingReservations")}
+                            <NavLink
+                                to="/pending-reservations"
+                                className="app-shell__nav-with-badge"
+                            >
+                                <span>{t("app.pendingReservations")}</span>
+                                {pendingCount > 0 ? (
+                                    <span className="nav-badge">{pendingCount}</span>
+                                ) : null}
                             </NavLink>
                             <NavLink to="/admin/appointments">
                                 {t("app.adminAppointments")}
