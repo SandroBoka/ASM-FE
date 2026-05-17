@@ -104,11 +104,79 @@ describe("AdminAppointmentsPage", () => {
         expect(screen.getByText("16.06.2026.")).toBeInTheDocument();
     });
 
+    it("filters appointments by an exact date and can show all dates again when cleared", async () => {
+        const user = userEvent.setup();
+        const appointments: Appointment[] = [
+            {
+                IdTermina: 1,
+                Datum: "2026-06-15",
+                VrijemeOd: "08:00:00",
+                VrijemeDo: "09:00:00",
+                Status: "slobodan",
+            },
+            {
+                IdTermina: 2,
+                Datum: "2026-06-16",
+                VrijemeOd: "10:00:00",
+                VrijemeDo: "11:00:00",
+                Status: "slobodan",
+            },
+        ];
+        (appointmentsHooks.useAllAppointments as unknown as AnyHook).mockReturnValue(
+            mockQuery(appointments),
+        );
+
+        renderWithProviders(<AdminAppointmentsPage />, {
+            auth: { user: adminUser, isAuthenticated: true },
+        });
+
+        await user.type(screen.getByLabelText("Datum termina"), "2026-06-16");
+
+        expect(screen.queryByText("15.06.2026.")).not.toBeInTheDocument();
+        expect(screen.getByText("16.06.2026.")).toBeInTheDocument();
+
+        await user.clear(screen.getByLabelText("Datum termina"));
+
+        expect(screen.getByText("15.06.2026.")).toBeInTheDocument();
+        expect(screen.getByText("16.06.2026.")).toBeInTheDocument();
+    });
+
     it("renders 'Dodaj termin' button for admin user", () => {
         renderWithProviders(<AdminAppointmentsPage />, {
             auth: { user: adminUser, isAuthenticated: true },
         });
 
         expect(screen.getByRole("button", { name: "Dodaj termin" })).toBeInTheDocument();
+    });
+
+    it("creates one-hour free appointments for a full working day from the add form", async () => {
+        const user = userEvent.setup();
+        const createMutation = mockMutation();
+        (appointmentsHooks.useCreateAppointment as unknown as AnyHook).mockReturnValue(
+            createMutation,
+        );
+
+        renderWithProviders(<AdminAppointmentsPage />, {
+            auth: { user: adminUser, isAuthenticated: true },
+        });
+
+        await user.click(screen.getByRole("button", { name: "Dodaj termin" }));
+        await user.type(screen.getByLabelText("Datum"), "2026-06-15");
+        await user.click(screen.getByRole("checkbox", { name: /Cijeli radni dan slobodan/ }));
+        await user.click(screen.getByRole("button", { name: "Spremi" }));
+
+        expect(createMutation.mutateAsync).toHaveBeenCalledTimes(12);
+        expect(createMutation.mutateAsync).toHaveBeenNthCalledWith(1, {
+            Datum: "2026-06-15",
+            VrijemeOd: "08:00",
+            VrijemeDo: "09:00",
+            Status: "slobodan",
+        });
+        expect(createMutation.mutateAsync).toHaveBeenNthCalledWith(12, {
+            Datum: "2026-06-15",
+            VrijemeOd: "19:00",
+            VrijemeDo: "20:00",
+            Status: "slobodan",
+        });
     });
 });

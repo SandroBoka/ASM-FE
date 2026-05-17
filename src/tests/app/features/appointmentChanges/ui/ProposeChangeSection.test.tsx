@@ -114,6 +114,8 @@ describe("ProposeChangeSection", () => {
 
         await user.click(screen.getByRole("button", { name: "Predloži promjenu termina" }));
 
+        expect(screen.getByLabelText("Datum od")).toBeInTheDocument();
+        expect(screen.getByLabelText("Datum do")).toBeInTheDocument();
         expect(screen.getByText("20.06.2026.")).toBeInTheDocument();
     });
 

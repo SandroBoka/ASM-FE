@@ -103,14 +103,14 @@ export function ProposeChangeSection({ reservation }: Props) {
 
             <div className="wizard-filters">
                 <AppTextField
-                    label={t("reservations.wizard.dateFrom")}
+                    label={t("reservations.form.dateFrom")}
                     name="changeDateFrom"
                     type="date"
                     value={dateFrom}
                     onChange={(event) => setDateFrom(event.target.value)}
                 />
                 <AppTextField
-                    label={t("reservations.wizard.dateTo")}
+                    label={t("reservations.form.dateTo")}
                     name="changeDateTo"
                     type="date"
                     value={dateTo}
@@ -127,7 +127,7 @@ export function ProposeChangeSection({ reservation }: Props) {
             ) : null}
 
             {!appointmentsQuery.isLoading && availableAppointments.length === 0 ? (
-                <Alert variant="info">{t("reservations.wizard.noAppointments")}</Alert>
+                <Alert variant="info">{t("reservations.form.noAppointments")}</Alert>
             ) : null}
 
             {availableAppointments.length > 0 ? (

@@ -252,6 +252,7 @@ const resources = {
             appointments: {
                 fields: {
                     date: "Datum",
+                    fullDayFree: "Cijeli radni dan slobodan (08:00–20:00)",
                     timeFrom: "Vrijeme od",
                     timeTo: "Vrijeme do",
                     status: "Status",
@@ -286,6 +287,7 @@ const resources = {
                 filterLabel: "Filter",
                 filterFree: "Samo slobodni",
                 filterAll: "Svi termini",
+                dateFilterLabel: "Datum termina",
             },
         },
     },
@@ -534,6 +536,7 @@ const resources = {
             appointments: {
                 fields: {
                     date: "Date",
+                    fullDayFree: "Full working day free (08:00–20:00)",
                     timeFrom: "Time from",
                     timeTo: "Time to",
                     status: "Status",
@@ -568,6 +571,7 @@ const resources = {
                 filterLabel: "Filter",
                 filterFree: "Free only",
                 filterAll: "All appointments",
+                dateFilterLabel: "Appointment date",
             },
         },
     },
