@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { LoginPage } from "../features/auth/ui/LoginPage";
 import { RegisterPage } from "../features/auth/ui/RegisterPage";
 import { HomePage } from "../features/home/HomePage";
+import { AdminAppointmentsPage } from "../features/appointments/ui/AdminAppointmentsPage";
 import { NewReservationPage } from "../features/reservations/ui/NewReservationPage";
 import { PendingReservationsPage } from "../features/reservations/ui/PendingReservationsPage";
 import { ReservationDetailsPage } from "../features/reservations/ui/ReservationDetailsPage";
@@ -52,8 +53,8 @@ export const router = createBrowserRouter([
                                 element: <PendingReservationsPage />,
                             },
                             {
-                                path: "pending-changes",
-                                element: <h1>Promjene termina (placeholder)</h1>,
+                                path: "admin/appointments",
+                                element: <AdminAppointmentsPage />,
                             },
                         ],
                     },

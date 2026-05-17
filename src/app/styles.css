@@ -732,6 +732,13 @@ h3 {
     font-weight: 600;
 }
 
+.reservation-list__head-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 .reservation-list__when {
     color: var(--color-primary-hover);
     font-weight: 700;
@@ -760,4 +767,102 @@ h3 {
 .reservation-list__actions {
     display: flex;
     justify-content: flex-end;
+}
+
+/* ===== Appointment change list ===== */
+
+.change-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.change-list__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+}
+
+.change-list__item--card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px 18px;
+    border-radius: var(--radius-md);
+}
+
+.change-list__body {
+    display: grid;
+    gap: 4px;
+}
+
+.change-list__appointments {
+    display: flex;
+    align-items: stretch;
+    gap: 16px;
+    padding: 12px;
+    background: var(--color-surface-muted);
+    border-radius: var(--radius-sm);
+}
+
+.change-list__slot {
+    flex: 1;
+    display: grid;
+    gap: 4px;
+}
+
+.change-list__slot strong {
+    color: var(--color-text);
+    font-size: 15px;
+}
+
+.change-list__arrow {
+    display: flex;
+    align-items: center;
+    color: var(--color-primary);
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.propose-change {
+    display: grid;
+    gap: 14px;
+}
+
+/* ===== Admin appointments list ===== */
+
+.appointment-admin-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.appointment-admin-list__item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+}
+
+.appointment-admin-list__main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 160px;
+}
+
+.appointment-admin-list__actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
 }

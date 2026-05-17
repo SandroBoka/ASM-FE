@@ -27,7 +27,9 @@ export function AppLayout() {
                     <NavLink to="/" end>
                         {t("app.home")}
                     </NavLink>
-                    <NavLink to="/vehicles">{t("app.vehicles")}</NavLink>
+                    {!isEmployee && (
+                        <NavLink to="/vehicles">{t("app.vehicles")}</NavLink>
+                    )}
                     <NavLink to="/reservations">{t("app.reservations")}</NavLink>
                     <NavLink to="/services">{t("app.services")}</NavLink>
 
@@ -36,8 +38,8 @@ export function AppLayout() {
                             <NavLink to="/pending-reservations">
                                 {t("app.pendingReservations")}
                             </NavLink>
-                            <NavLink to="/pending-changes">
-                                {t("app.pendingChanges")}
+                            <NavLink to="/admin/appointments">
+                                {t("app.adminAppointments")}
                             </NavLink>
                         </>
                     )}

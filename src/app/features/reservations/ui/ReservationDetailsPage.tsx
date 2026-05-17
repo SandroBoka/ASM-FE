@@ -5,6 +5,12 @@ import { Alert } from "../../../components/ui/Alert";
 import { AppButton } from "../../../components/ui/AppButton";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { useAppointmentById } from "../../appointments/hooks/useAppointments";
+import { useChangesForReservation } from "../../appointmentChanges/hooks/useAppointmentChanges";
+import { ProposeChangeSection } from "../../appointmentChanges/ui/ProposeChangeSection";
+import type {
+    AppointmentChange,
+    AppointmentChangeStatus,
+} from "../../appointmentChanges/models/appointmentChangeTypes";
 import { useVehicleById } from "../../vehicles/hooks/useVehicles";
 import {
     useApproveReservation,
@@ -49,6 +55,72 @@ function StatusPill({ status }: { status: ReservationStatus }) {
     );
 }
 
+const CHANGE_STATUS_MODIFIERS: Record<AppointmentChangeStatus, string> = {
+    "na cekanju": "status-pill--pending",
+    prihvacen: "status-pill--approved",
+    odbijen: "status-pill--rejected",
+};
+
+function ChangeStatusPill({ status }: { status: AppointmentChangeStatus }) {
+    const { t } = useTranslation();
+    return (
+        <span className={`status-pill ${CHANGE_STATUS_MODIFIERS[status]}`}>
+            {t(`appointmentChanges.status.${status.replace(" ", "_")}`)}
+        </span>
+    );
+}
+
+function ChangeHistoryItem({ change }: { change: AppointmentChange }) {
+    const { t } = useTranslation();
+    const oldAppointmentQuery = useAppointmentById(change.IdStarogTermina);
+    const newAppointmentQuery = useAppointmentById(change.IdNovogTermina);
+    const oldAppointment = oldAppointmentQuery.data;
+    const newAppointment = newAppointmentQuery.data;
+
+    return (
+        <li className="change-list__item change-list__item--card">
+            <div className="reservation-list__head">
+                <ChangeStatusPill status={change.Status} />
+                <span className="reservation-list__created">
+                    {t("appointmentChanges.requestedOn", {
+                        date: formatDate(change.DatumZahtjeva),
+                    })}
+                </span>
+            </div>
+
+            <div className="change-list__appointments">
+                <div className="change-list__slot">
+                    <span className="muted-hint">{t("appointmentChanges.oldAppointment")}</span>
+                    <strong>
+                        {oldAppointment
+                            ? `${formatDate(oldAppointment.Datum)} · ${formatTimeRange(
+                                  oldAppointment.VrijemeOd,
+                                  oldAppointment.VrijemeDo,
+                              )}`
+                            : "—"}
+                    </strong>
+                </div>
+                <div className="change-list__arrow">→</div>
+                <div className="change-list__slot">
+                    <span className="muted-hint">{t("appointmentChanges.newAppointment")}</span>
+                    <strong>
+                        {newAppointment
+                            ? `${formatDate(newAppointment.Datum)} · ${formatTimeRange(
+                                  newAppointment.VrijemeOd,
+                                  newAppointment.VrijemeDo,
+                              )}`
+                            : "—"}
+                    </strong>
+                </div>
+            </div>
+
+            {change.KomentarZaposlenika ? (
+                <p className="muted-hint">{change.KomentarZaposlenika}</p>
+            ) : null}
+        </li>
+    );
+}
+
 export function ReservationDetailsPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -62,6 +134,9 @@ export function ReservationDetailsPage() {
     );
     const vehicleQuery = useVehicleById(reservationQuery.data?.IdVozila ?? null);
     const appointmentQuery = useAppointmentById(reservationQuery.data?.IdTermina ?? null);
+    const changesQuery = useChangesForReservation(
+        Number.isNaN(reservationId) ? null : reservationId,
+    );
 
     const approveMutation = useApproveReservation();
     const rejectMutation = useRejectReservation();
@@ -111,6 +186,13 @@ export function ReservationDetailsPage() {
     const canApprove = isEmployee && reservation.Status === "na cekanju";
     const canReject = isEmployee && reservation.Status === "na cekanju";
     const canComplete = isEmployee && reservation.Status === "odobrena";
+
+    const changes = changesQuery.data ?? [];
+    const hasPendingChange = changes.some((change) => change.Status === "na cekanju");
+    const canProposeChange =
+        isOwner &&
+        (reservation.Status === "na cekanju" || reservation.Status === "odobrena") &&
+        !hasPendingChange;
 
     const totalPrice = reservation.services.reduce(
         (acc, item) => acc + Number(item.service.Cijena) * item.Kolicina,
@@ -189,6 +271,30 @@ export function ReservationDetailsPage() {
                 <section className="page__section">
                     <h2>{t("reservations.employeeComment")}</h2>
                     <p>{reservation.KomentarZaposlenika}</p>
+                </section>
+            ) : null}
+
+            {changes.length > 0 ? (
+                <section className="page__section">
+                    <h2>{t("appointmentChanges.relatedTitle")}</h2>
+                    <ul className="change-list">
+                        {changes.map((change) => (
+                            <ChangeHistoryItem
+                                key={change.IdZahtjevaPromjene}
+                                change={change}
+                            />
+                        ))}
+                    </ul>
+                </section>
+            ) : null}
+
+            {canProposeChange ? (
+                <section className="page__section">
+                    <h2>{t("appointmentChanges.proposeTitle")}</h2>
+                    <ProposeChangeSection
+                        reservationId={reservation.IdRezervacije}
+                        currentAppointmentId={reservation.IdTermina}
+                    />
                 </section>
             ) : null}
 

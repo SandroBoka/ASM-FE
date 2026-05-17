@@ -6,6 +6,7 @@ import { Alert } from "../../../components/ui/Alert";
 import { AppButton } from "../../../components/ui/AppButton";
 import * as appointmentsApi from "../../appointments/api/appointmentsApi";
 import type { Appointment } from "../../appointments/models/appointmentTypes";
+import { useChangesForReservation } from "../../appointmentChanges/hooks/useAppointmentChanges";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { useVehiclesByCustomerId } from "../../vehicles/hooks/useVehicles";
 import {
@@ -211,11 +212,22 @@ type ReservationListItemProps = {
 
 function ReservationListItem({ reservation, appointment, vehicleLabel }: ReservationListItemProps) {
     const { t } = useTranslation();
+    const changesQuery = useChangesForReservation(reservation.IdRezervacije);
+    const hasPendingChange = (changesQuery.data ?? []).some(
+        (change) => change.Status === "na cekanju",
+    );
 
     return (
         <li className="reservation-list__item">
             <div className="reservation-list__head">
-                <StatusPill status={reservation.Status} />
+                <div className="reservation-list__head-left">
+                    <StatusPill status={reservation.Status} />
+                    {hasPendingChange ? (
+                        <span className="status-pill status-pill--pending">
+                            {t("reservations.changePendingBadge")}
+                        </span>
+                    ) : null}
+                </div>
                 <span className="reservation-list__when">
                     {appointment
                         ? `${formatDate(appointment.Datum)} · ${formatTimeRange(
