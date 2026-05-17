@@ -1,34 +1,28 @@
-import { screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import { NewReservationPage } from "../../../../../app/features/reservations/ui/NewReservationPage";
 import * as appointmentsHooks from "../../../../../app/features/appointments/hooks/useAppointments";
-import * as vehiclesHooks from "../../../../../app/features/vehicles/hooks/useVehicles";
-import * as servicesHooks from "../../../../../app/features/services/hooks/useServices";
 import * as reservationsHooks from "../../../../../app/features/reservations/hooks/useReservations";
-import type { Appointment } from "../../../../../app/features/appointments/models/appointmentTypes";
-import type { Vehicle } from "../../../../../app/features/vehicles/models/vehicleTypes";
-import type { Service } from "../../../../../app/features/services/models/serviceTypes";
+import * as servicesHooks from "../../../../../app/features/services/hooks/useServices";
+import * as vehiclesHooks from "../../../../../app/features/vehicles/hooks/useVehicles";
 import { renderWithProviders } from "../../../../testUtils/renderWithProviders";
 
 vi.mock("../../../../../app/features/appointments/hooks/useAppointments", () => ({
     useFreeAppointments: vi.fn(),
 }));
-
-vi.mock("../../../../../app/features/vehicles/hooks/useVehicles", () => ({
-    useVehiclesByCustomerId: vi.fn(),
-}));
-
 vi.mock("../../../../../app/features/services/hooks/useServices", () => ({
     useServices: vi.fn(),
 }));
-
+vi.mock("../../../../../app/features/vehicles/hooks/useVehicles", () => ({
+    useVehiclesByCustomerId: vi.fn(),
+}));
 vi.mock("../../../../../app/features/reservations/hooks/useReservations", () => ({
     useCreateReservation: vi.fn(),
 }));
 
 const customerUser = {
-    IdOsobe: 1,
+    IdOsobe: 7,
     Ime: "Ana",
     Prezime: "Anic",
     Email: "ana@example.com",
@@ -52,156 +46,153 @@ function mockMutation(overrides: Record<string, unknown> = {}) {
     return {
         mutate: vi.fn(),
         mutateAsync: vi.fn().mockResolvedValue(undefined),
+        reset: vi.fn(),
         isPending: false,
         isSuccess: false,
         isError: false,
         error: null,
-        reset: vi.fn(),
         ...overrides,
     };
 }
 
-const appointments: Appointment[] = [
-    {
-        IdTermina: 1,
-        Datum: "2026-06-15",
-        VrijemeOd: "08:00:00",
-        VrijemeDo: "09:00:00",
-        Status: "slobodan",
-    },
-    {
-        IdTermina: 2,
-        Datum: "2026-06-16",
-        VrijemeOd: "10:00:00",
-        VrijemeDo: "11:00:00",
-        Status: "slobodan",
-    },
-];
+const APPOINTMENT_60_MIN = {
+    IdTermina: 11,
+    Datum: "2026-06-15",
+    VrijemeOd: "08:00:00",
+    VrijemeDo: "09:00:00",
+    Status: "slobodan" as const,
+};
 
-const vehicles: Vehicle[] = [
-    {
-        IdVozila: 10,
-        IdOsobe: 1,
-        Marka: "VW",
-        Model: "Golf",
-        Godina: 2018,
-        VrstaMotora: "dizel",
-        RegOznaka: "ZG-1234-AB",
-    },
-];
+const VEHICLE_GOLF = {
+    IdVozila: 21,
+    IdOsobe: 7,
+    Marka: "VW",
+    Model: "Golf",
+    Godina: 2018,
+    VrstaMotora: "dizel",
+    RegOznaka: "ZG-1234-AB",
+};
 
-const services: Service[] = [
-    {
-        IdUsluge: 7,
-        NazivUsluge: "Zamjena ulja",
-        Opis: "Servis",
-        Trajanje: 30,
-        Cijena: "50.00",
-    },
-];
+const SERVICE_OIL = {
+    IdUsluge: 1,
+    NazivUsluge: "Zamjena ulja",
+    Opis: null,
+    Trajanje: 30,
+    Cijena: "60.00",
+};
 
-function setupDefaultMocks() {
+const SERVICE_BRAKES = {
+    IdUsluge: 2,
+    NazivUsluge: "Pločice",
+    Opis: null,
+    Trajanje: 45,
+    Cijena: "120.00",
+};
+
+function setupHooks(overrides: { createMutateAsync?: ReturnType<typeof vi.fn> } = {}) {
     (appointmentsHooks.useFreeAppointments as unknown as AnyHook).mockReturnValue(
-        mockQuery(appointments),
+        mockQuery([APPOINTMENT_60_MIN]),
     );
     (vehiclesHooks.useVehiclesByCustomerId as unknown as AnyHook).mockReturnValue(
-        mockQuery(vehicles),
+        mockQuery([VEHICLE_GOLF]),
     );
-    (servicesHooks.useServices as unknown as AnyHook).mockReturnValue(mockQuery(services));
-    (reservationsHooks.useCreateReservation as unknown as AnyHook).mockReturnValue(mockMutation());
+    (servicesHooks.useServices as unknown as AnyHook).mockReturnValue(
+        mockQuery([SERVICE_OIL, SERVICE_BRAKES]),
+    );
+    (reservationsHooks.useCreateReservation as unknown as AnyHook).mockReturnValue(
+        mockMutation(
+            overrides.createMutateAsync ? { mutateAsync: overrides.createMutateAsync } : {},
+        ),
+    );
 }
 
-describe("NewReservationPage", () => {
+describe("NewReservationPage (master-detail form)", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        setupDefaultMocks();
+        setupHooks();
     });
 
-    it("shows free appointments and disables 'Dalje' until an appointment is picked", () => {
+    it("renders header dropdowns and an empty detail section", () => {
         renderWithProviders(<NewReservationPage />, {
             auth: { user: customerUser, isAuthenticated: true },
         });
 
-        expect(screen.getByText("15.06.2026.")).toBeInTheDocument();
-        expect(screen.getByText("16.06.2026.")).toBeInTheDocument();
-
-        const nextButton = screen.getByRole("button", { name: "Dalje" });
-        expect(nextButton).toBeDisabled();
+        expect(screen.getByLabelText("Termin")).toBeInTheDocument();
+        expect(screen.getByLabelText("Vozilo")).toBeInTheDocument();
+        expect(screen.getByLabelText("Kilometraža vozila")).toBeInTheDocument();
+        expect(screen.getByLabelText("Opis problema")).toBeInTheDocument();
+        expect(screen.getByText("Klikni 'Dodaj uslugu' za prvi redak.")).toBeInTheDocument();
     });
 
-    it("advances to step 2 after selecting an appointment and clicking 'Dalje'", async () => {
+    it("flags missing appointment when submitting an empty form", async () => {
         const user = userEvent.setup();
-        renderWithProviders(<NewReservationPage />, {
+        const { container } = renderWithProviders(<NewReservationPage />, {
             auth: { user: customerUser, isAuthenticated: true },
         });
 
-        await user.click(screen.getByText("15.06.2026."));
-        await user.click(screen.getByRole("button", { name: "Dalje" }));
+        const form = container.querySelector("form")!;
+        fireEvent.submit(form);
 
-        expect(screen.getByRole("heading", { name: "Odabir vozila" })).toBeInTheDocument();
-        expect(screen.getByText(/VW Golf/)).toBeInTheDocument();
+        expect(await screen.findByText("Odaberi termin.")).toBeInTheDocument();
+
+        await user.selectOptions(screen.getByLabelText("Termin"), "11");
+        fireEvent.submit(form);
+        expect(await screen.findByText("Odaberi vozilo.")).toBeInTheDocument();
     });
 
-    it("validates kilometers and description on step 3", async () => {
+    it("blocks submit when services duration exceeds the chosen slot", async () => {
         const user = userEvent.setup();
-        renderWithProviders(<NewReservationPage />, {
+        const { container } = renderWithProviders(<NewReservationPage />, {
             auth: { user: customerUser, isAuthenticated: true },
         });
 
-        // step 1 -> step 2
-        await user.click(screen.getByText("15.06.2026."));
-        await user.click(screen.getByRole("button", { name: "Dalje" }));
-
-        // step 2 -> step 3
-        await user.click(screen.getByRole("button", { name: "Odaberi" }));
-        await user.click(screen.getByRole("button", { name: "Dalje" }));
-
-        // empty description -> validation
-        const kmInput = screen.getByLabelText("Kilometraža vozila");
-        await user.type(kmInput, "100000");
-        await user.click(screen.getByRole("button", { name: "Dalje" }));
-
-        expect(await screen.findByText("Opis problema je obavezan.")).toBeInTheDocument();
-    });
-
-    it("calls createReservation.mutateAsync with the full payload on final submit", async () => {
-        const user = userEvent.setup();
-        const mutateAsync = vi.fn().mockResolvedValue({ IdRezervacije: 1 });
-        (reservationsHooks.useCreateReservation as unknown as AnyHook).mockReturnValue(
-            mockMutation({ mutateAsync }),
-        );
-
-        renderWithProviders(<NewReservationPage />, {
-            auth: { user: customerUser, isAuthenticated: true },
-        });
-
-        // step 1
-        await user.click(screen.getByText("15.06.2026."));
-        await user.click(screen.getByRole("button", { name: "Dalje" }));
-
-        // step 2
-        await user.click(screen.getByRole("button", { name: "Odaberi" }));
-        await user.click(screen.getByRole("button", { name: "Dalje" }));
-
-        // step 3
-        await user.type(screen.getByLabelText("Kilometraža vozila"), "100000");
+        await user.selectOptions(screen.getByLabelText("Termin"), "11");
+        await user.selectOptions(screen.getByLabelText("Vozilo"), "21");
+        await user.type(screen.getByLabelText("Kilometraža vozila"), "120000");
         await user.type(screen.getByLabelText("Opis problema"), "Curi ulje");
-        await user.click(screen.getByRole("button", { name: "Dalje" }));
 
-        // step 4 (skip choosing services)
-        await user.click(screen.getByRole("button", { name: "Dalje" }));
+        await user.click(screen.getByRole("button", { name: "Dodaj uslugu" }));
+        await user.click(screen.getByRole("button", { name: "Dodaj uslugu" }));
+        const serviceSelects = screen.getAllByRole("combobox", { name: "Usluga" });
+        await user.selectOptions(serviceSelects[0], "1");
+        await user.selectOptions(serviceSelects[1], "2");
 
-        // step 5: submit
-        await user.click(screen.getByRole("button", { name: "Potvrdi rezervaciju" }));
+        const form = container.querySelector("form")!;
+        fireEvent.submit(form);
+
+        expect(
+            await screen.findByText(/Odabrane usluge traju 75 min, a odabrani termin traje 60 min/),
+        ).toBeInTheDocument();
+    });
+
+    it("submits the full payload to createReservation.mutateAsync", async () => {
+        const user = userEvent.setup();
+        const mutateAsync = vi.fn().mockResolvedValue(undefined);
+        setupHooks({ createMutateAsync: mutateAsync });
+
+        const { container } = renderWithProviders(<NewReservationPage />, {
+            auth: { user: customerUser, isAuthenticated: true },
+        });
+
+        await user.selectOptions(screen.getByLabelText("Termin"), "11");
+        await user.selectOptions(screen.getByLabelText("Vozilo"), "21");
+        await user.type(screen.getByLabelText("Kilometraža vozila"), "98000");
+        await user.type(screen.getByLabelText("Opis problema"), "Servis prije ljeta");
+
+        await user.click(screen.getByRole("button", { name: "Dodaj uslugu" }));
+        await user.selectOptions(screen.getByRole("combobox", { name: "Usluga" }), "1");
+
+        const form = container.querySelector("form")!;
+        fireEvent.submit(form);
 
         await waitFor(() => {
             expect(mutateAsync).toHaveBeenCalledWith({
-                IdOsobe_Korisnik: 1,
-                IdTermina: 1,
-                IdVozila: 10,
-                KilometrazaVozila: 100000,
-                OpisProblema: "Curi ulje",
-                services: [],
+                IdOsobe_Korisnik: 7,
+                IdTermina: 11,
+                IdVozila: 21,
+                KilometrazaVozila: 98000,
+                OpisProblema: "Servis prije ljeta",
+                services: [{ IdUsluge: 1, Kolicina: 1 }],
             });
         });
     });

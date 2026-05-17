@@ -35,6 +35,33 @@ export type ReservationCreatePayload = {
     services: ReservationServiceItemPayload[];
 };
 
+export type ReservationUpdatePayload = {
+    IdTermina: number;
+    IdVozila: number;
+    KilometrazaVozila: number;
+    OpisProblema: string;
+};
+
+export type ReservationServiceAddPayload = {
+    IdUsluge: number;
+    Kolicina: number;
+};
+
+export type ReservationServiceQuantityPayload = {
+    Kolicina: number;
+};
+
+export type ReservationServiceResponse = {
+    Kolicina: number;
+    service: {
+        IdUsluge: number;
+        NazivUsluge: string;
+        Opis: string | null;
+        Trajanje: number;
+        Cijena: string;
+    };
+};
+
 export type ReservationActionPayload = {
     komentar?: string | null;
 };

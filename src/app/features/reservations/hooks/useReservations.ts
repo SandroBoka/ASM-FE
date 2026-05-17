@@ -4,6 +4,10 @@ import type {
     Reservation,
     ReservationActionPayload,
     ReservationCreatePayload,
+    ReservationServiceAddPayload,
+    ReservationServiceQuantityPayload,
+    ReservationServiceResponse,
+    ReservationUpdatePayload,
 } from "../models/reservationTypes";
 
 const RESERVATIONS_QUERY_KEY = "reservations";
@@ -53,6 +57,83 @@ export function useCreateReservation() {
         mutationFn: (payload) => reservationsApi.createReservation(payload),
         onSuccess: () => {
             invalidateReservationsAndAppointments(queryClient);
+        },
+    });
+}
+
+export function useUpdateReservation() {
+    const queryClient = useQueryClient();
+
+    return useMutation<
+        Reservation,
+        Error,
+        { reservationId: number; payload: ReservationUpdatePayload }
+    >({
+        mutationFn: ({ reservationId, payload }) =>
+            reservationsApi.updateReservation(reservationId, payload),
+        onSuccess: (reservation) => {
+            invalidateReservationsAndAppointments(queryClient);
+            queryClient.setQueryData(
+                [RESERVATIONS_QUERY_KEY, "detail", reservation.IdRezervacije],
+                reservation,
+            );
+        },
+    });
+}
+
+export function useAddReservationService() {
+    const queryClient = useQueryClient();
+
+    return useMutation<
+        ReservationServiceResponse,
+        Error,
+        { reservationId: number; payload: ReservationServiceAddPayload }
+    >({
+        mutationFn: ({ reservationId, payload }) =>
+            reservationsApi.addReservationService(reservationId, payload),
+        onSuccess: (_data, variables) => {
+            queryClient.invalidateQueries({
+                queryKey: [RESERVATIONS_QUERY_KEY, "detail", variables.reservationId],
+            });
+            queryClient.invalidateQueries({ queryKey: [RESERVATIONS_QUERY_KEY] });
+        },
+    });
+}
+
+export function useUpdateReservationService() {
+    const queryClient = useQueryClient();
+
+    return useMutation<
+        ReservationServiceResponse,
+        Error,
+        {
+            reservationId: number;
+            serviceId: number;
+            payload: ReservationServiceQuantityPayload;
+        }
+    >({
+        mutationFn: ({ reservationId, serviceId, payload }) =>
+            reservationsApi.updateReservationService(reservationId, serviceId, payload),
+        onSuccess: (_data, variables) => {
+            queryClient.invalidateQueries({
+                queryKey: [RESERVATIONS_QUERY_KEY, "detail", variables.reservationId],
+            });
+            queryClient.invalidateQueries({ queryKey: [RESERVATIONS_QUERY_KEY] });
+        },
+    });
+}
+
+export function useRemoveReservationService() {
+    const queryClient = useQueryClient();
+
+    return useMutation<void, Error, { reservationId: number; serviceId: number }>({
+        mutationFn: ({ reservationId, serviceId }) =>
+            reservationsApi.removeReservationService(reservationId, serviceId),
+        onSuccess: (_data, variables) => {
+            queryClient.invalidateQueries({
+                queryKey: [RESERVATIONS_QUERY_KEY, "detail", variables.reservationId],
+            });
+            queryClient.invalidateQueries({ queryKey: [RESERVATIONS_QUERY_KEY] });
         },
     });
 }

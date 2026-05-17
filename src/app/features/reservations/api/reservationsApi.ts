@@ -3,12 +3,53 @@ import type {
     Reservation,
     ReservationActionPayload,
     ReservationCreatePayload,
+    ReservationServiceAddPayload,
+    ReservationServiceQuantityPayload,
+    ReservationServiceResponse,
+    ReservationUpdatePayload,
 } from "../models/reservationTypes";
 
 export function createReservation(payload: ReservationCreatePayload): Promise<Reservation> {
     return httpClient<Reservation>("/reservations", {
         method: "POST",
         body: payload,
+    });
+}
+
+export function updateReservation(
+    reservationId: number,
+    payload: ReservationUpdatePayload,
+): Promise<Reservation> {
+    return httpClient<Reservation>(`/reservations/${reservationId}`, {
+        method: "PUT",
+        body: payload,
+    });
+}
+
+export function addReservationService(
+    reservationId: number,
+    payload: ReservationServiceAddPayload,
+): Promise<ReservationServiceResponse> {
+    return httpClient<ReservationServiceResponse>(`/reservations/${reservationId}/services`, {
+        method: "POST",
+        body: payload,
+    });
+}
+
+export function updateReservationService(
+    reservationId: number,
+    serviceId: number,
+    payload: ReservationServiceQuantityPayload,
+): Promise<ReservationServiceResponse> {
+    return httpClient<ReservationServiceResponse>(
+        `/reservations/${reservationId}/services/${serviceId}`,
+        { method: "PUT", body: payload },
+    );
+}
+
+export function removeReservationService(reservationId: number, serviceId: number): Promise<void> {
+    return httpClient<void>(`/reservations/${reservationId}/services/${serviceId}`, {
+        method: "DELETE",
     });
 }
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Alert } from "../../../components/ui/Alert";
 import { AppButton } from "../../../components/ui/AppButton";
@@ -179,6 +179,7 @@ export function ReservationDetailsPage() {
 
     const canCancel =
         isOwner && (reservation.Status === "na cekanju" || reservation.Status === "odobrena");
+    const canEdit = isOwner && reservation.Status === "na cekanju";
     const canApprove = isEmployee && reservation.Status === "na cekanju";
     const canReject = isEmployee && reservation.Status === "na cekanju";
     const canComplete = isEmployee && reservation.Status === "odobrena";
@@ -228,6 +229,11 @@ export function ReservationDetailsPage() {
             <header className="page__header">
                 <h1>{t("reservations.detailTitle", { id: reservation.IdRezervacije })}</h1>
                 <StatusPill status={reservation.Status} />
+                {canEdit ? (
+                    <Link to={`/reservations/${reservation.IdRezervacije}/edit`}>
+                        <AppButton variant="secondary">{t("reservations.editAction")}</AppButton>
+                    </Link>
+                ) : null}
             </header>
 
             <section className="page__section">
