@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert } from "../../../components/ui/Alert";
 import { AppButton } from "../../../components/ui/AppButton";
+import { AppTextField } from "../../../components/ui/AppTextField";
 import { useAuth } from "../../auth/hooks/useAuth";
 import {
     useCreateService,
@@ -36,8 +37,10 @@ export function ServicesPage() {
     const { t } = useTranslation();
     const { user } = useAuth();
     const [mode, setMode] = useState<Mode>({ type: "list" });
+    const [searchTerm, setSearchTerm] = useState("");
 
-    const servicesQuery = useServices();
+    const trimmedSearch = searchTerm.trim();
+    const servicesQuery = useServices(trimmedSearch === "" ? undefined : trimmedSearch);
     const createMutation = useCreateService();
     const updateMutation = useUpdateService();
     const deleteMutation = useDeleteService();
@@ -116,6 +119,14 @@ export function ServicesPage() {
             ) : null}
 
             <section className="page__section">
+                <AppTextField
+                    label={t("services.searchLabel")}
+                    name="serviceSearch"
+                    value={searchTerm}
+                    onChange={(event) => setSearchTerm(event.target.value)}
+                    placeholder={t("services.searchPlaceholder")}
+                />
+
                 {servicesQuery.isLoading ? <p>{t("common.loading")}</p> : null}
 
                 {servicesQuery.isError ? (
@@ -135,7 +146,9 @@ export function ServicesPage() {
                 ) : null}
 
                 {servicesQuery.data && servicesQuery.data.length === 0 ? (
-                    <Alert variant="info">{t("services.empty")}</Alert>
+                    <Alert variant="info">
+                        {trimmedSearch === "" ? t("services.empty") : t("services.emptySearch")}
+                    </Alert>
                 ) : null}
 
                 {servicesQuery.data && servicesQuery.data.length > 0 ? (

@@ -104,6 +104,31 @@ describe("ServicesPage", () => {
         expect(screen.getByLabelText("Trajanje (minute)")).toBeInTheDocument();
     });
 
+    it("forwards the typed search term to the useServices hook", async () => {
+        const user = userEvent.setup();
+        const useServicesMock = servicesHooks.useServices as unknown as AnyHook;
+
+        renderWithProviders(<ServicesPage />, {
+            auth: { user: employeeUser, isAuthenticated: true },
+        });
+
+        await user.type(screen.getByLabelText("Pretraži"), "  ulja  ");
+
+        expect(useServicesMock).toHaveBeenLastCalledWith("ulja");
+    });
+
+    it("shows the search-specific empty state when filtering returns nothing", async () => {
+        const user = userEvent.setup();
+
+        renderWithProviders(<ServicesPage />, {
+            auth: { user: employeeUser, isAuthenticated: true },
+        });
+
+        await user.type(screen.getByLabelText("Pretraži"), "nepostojeca");
+
+        expect(screen.getByText("Nijedna usluga ne odgovara pretrazi.")).toBeInTheDocument();
+    });
+
     it("hides employee actions for customer users", () => {
         const services: Service[] = [
             {
