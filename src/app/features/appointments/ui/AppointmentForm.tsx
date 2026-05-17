@@ -11,10 +11,12 @@ export type AppointmentFormValues = {
     VrijemeOd: string;
     VrijemeDo: string;
     Status: AppointmentStatus;
+    createHourlySlots?: boolean;
 };
 
 type Props = {
     initialValues?: Appointment;
+    allowFullDayFree?: boolean;
     onSubmit: (values: AppointmentFormValues) => Promise<void> | void;
     onCancel?: () => void;
     submitLabel: string;
@@ -23,9 +25,12 @@ type Props = {
 };
 
 const STATUS_OPTIONS: AppointmentStatus[] = ["slobodan", "otkazan"];
+const FULL_DAY_TIME_FROM = "08:00";
+const FULL_DAY_TIME_TO = "20:00";
 
 export function AppointmentForm({
     initialValues,
+    allowFullDayFree = false,
     onSubmit,
     onCancel,
     submitLabel,
@@ -37,6 +42,7 @@ export function AppointmentForm({
     const [vrijemeOd, setVrijemeOd] = useState(initialValues?.VrijemeOd?.slice(0, 5) ?? "");
     const [vrijemeDo, setVrijemeDo] = useState(initialValues?.VrijemeDo?.slice(0, 5) ?? "");
     const [status, setStatus] = useState<AppointmentStatus>(initialValues?.Status ?? "slobodan");
+    const [isFullDayFree, setIsFullDayFree] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -44,23 +50,27 @@ export function AppointmentForm({
         event.preventDefault();
         setValidationError(null);
 
-        if (!datum || !vrijemeOd || !vrijemeDo) {
+        if (!datum || (!isFullDayFree && (!vrijemeOd || !vrijemeDo))) {
             setValidationError(t("appointments.validation.missingFields"));
             return;
         }
-        if (vrijemeOd >= vrijemeDo) {
+        if (!isFullDayFree && vrijemeOd >= vrijemeDo) {
             setValidationError(t("appointments.validation.timeRangeInvalid"));
             return;
         }
 
         setIsSubmitting(true);
         try {
-            await onSubmit({
+            const values: AppointmentFormValues = {
                 Datum: datum,
-                VrijemeOd: vrijemeOd,
-                VrijemeDo: vrijemeDo,
-                Status: status,
-            });
+                VrijemeOd: isFullDayFree ? FULL_DAY_TIME_FROM : vrijemeOd,
+                VrijemeDo: isFullDayFree ? FULL_DAY_TIME_TO : vrijemeDo,
+                Status: isFullDayFree ? "slobodan" : status,
+            };
+            if (isFullDayFree) {
+                values.createHourlySlots = true;
+            }
+            await onSubmit(values);
         } finally {
             setIsSubmitting(false);
         }
@@ -79,22 +89,35 @@ export function AppointmentForm({
                 required
             />
 
+            {allowFullDayFree ? (
+                <label className="ui-checkbox-field">
+                    <input
+                        type="checkbox"
+                        checked={isFullDayFree}
+                        onChange={(event) => setIsFullDayFree(event.target.checked)}
+                    />
+                    <span>{t("appointments.fields.fullDayFree")}</span>
+                </label>
+            ) : null}
+
             <div className="wizard-filters">
                 <AppTextField
                     label={t("appointments.fields.timeFrom")}
                     name="vrijemeOd"
                     type="time"
-                    value={vrijemeOd}
+                    value={isFullDayFree ? FULL_DAY_TIME_FROM : vrijemeOd}
                     onChange={(event) => setVrijemeOd(event.target.value)}
-                    required
+                    disabled={isFullDayFree}
+                    required={!isFullDayFree}
                 />
                 <AppTextField
                     label={t("appointments.fields.timeTo")}
                     name="vrijemeDo"
                     type="time"
-                    value={vrijemeDo}
+                    value={isFullDayFree ? FULL_DAY_TIME_TO : vrijemeDo}
                     onChange={(event) => setVrijemeDo(event.target.value)}
-                    required
+                    disabled={isFullDayFree}
+                    required={!isFullDayFree}
                 />
             </div>
 
@@ -103,8 +126,9 @@ export function AppointmentForm({
                 <select
                     className="ui-field__input"
                     name="status"
-                    value={status}
+                    value={isFullDayFree ? "slobodan" : status}
                     onChange={(event) => setStatus(event.target.value as AppointmentStatus)}
+                    disabled={isFullDayFree}
                 >
                     {STATUS_OPTIONS.map((option) => (
                         <option key={option} value={option}>

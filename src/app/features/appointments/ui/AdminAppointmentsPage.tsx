@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert } from "../../../components/ui/Alert";
 import { AppButton } from "../../../components/ui/AppButton";
+import { AppTextField } from "../../../components/ui/AppTextField";
 import { useAuth } from "../../auth/hooks/useAuth";
 import {
     useAllAppointments,
@@ -32,6 +33,31 @@ function getErrorMessage(error: unknown, fallback: string): string | null {
     return fallback;
 }
 
+function buildHourlyAppointmentPayloads(values: AppointmentFormValues): AppointmentFormValues[] {
+    const [fromHours] = values.VrijemeOd.split(":").map(Number);
+    const [toHours] = values.VrijemeDo.split(":").map(Number);
+
+    return Array.from({ length: toHours - fromHours }, (_, index) => {
+        const hour = fromHours + index;
+        const nextHour = hour + 1;
+        return {
+            Datum: values.Datum,
+            VrijemeOd: `${String(hour).padStart(2, "0")}:00`,
+            VrijemeDo: `${String(nextHour).padStart(2, "0")}:00`,
+            Status: "slobodan",
+        };
+    });
+}
+
+function toAppointmentPayload(values: AppointmentFormValues): AppointmentFormValues {
+    return {
+        Datum: values.Datum,
+        VrijemeOd: values.VrijemeOd,
+        VrijemeDo: values.VrijemeDo,
+        Status: values.Status,
+    };
+}
+
 const STATUS_MODIFIERS: Record<AppointmentStatus, string> = {
     slobodan: "status-pill--approved",
     zauzet: "status-pill--pending",
@@ -43,6 +69,7 @@ export function AdminAppointmentsPage() {
     const { user } = useAuth();
     const [mode, setMode] = useState<Mode>({ type: "list" });
     const [statusFilter, setStatusFilter] = useState<StatusFilter>("slobodan");
+    const [dateFilter, setDateFilter] = useState("");
 
     const canEdit =
         user?.TipKorisnika === "employee" &&
@@ -55,14 +82,17 @@ export function AdminAppointmentsPage() {
 
     const sortedAppointments = useMemo(() => {
         const data = appointmentsQuery.data ?? [];
-        const filtered =
-            statusFilter === "all" ? data : data.filter((a) => a.Status === statusFilter);
+        const filtered = data.filter((appointment) => {
+            const matchesStatus = statusFilter === "all" || appointment.Status === statusFilter;
+            const matchesDate = dateFilter === "" || appointment.Datum === dateFilter;
+            return matchesStatus && matchesDate;
+        });
         return filtered.sort((a, b) => {
             const aKey = `${a.Datum}T${a.VrijemeOd}`;
             const bKey = `${b.Datum}T${b.VrijemeOd}`;
             return aKey.localeCompare(bKey);
         });
-    }, [appointmentsQuery.data, statusFilter]);
+    }, [appointmentsQuery.data, dateFilter, statusFilter]);
 
     if (!user) {
         return null;
@@ -78,7 +108,14 @@ export function AdminAppointmentsPage() {
     }
 
     async function handleCreate(values: AppointmentFormValues) {
-        await createMutation.mutateAsync(values);
+        if (values.createHourlySlots) {
+            const hourlyPayloads = buildHourlyAppointmentPayloads(values);
+            for (const payload of hourlyPayloads) {
+                await createMutation.mutateAsync(payload);
+            }
+        } else {
+            await createMutation.mutateAsync(toAppointmentPayload(values));
+        }
         setMode({ type: "list" });
     }
 
@@ -121,6 +158,7 @@ export function AdminAppointmentsPage() {
                 <section className="page__section">
                     <h2>{t("adminAppointments.addTitle")}</h2>
                     <AppointmentForm
+                        allowFullDayFree
                         onSubmit={handleCreate}
                         onCancel={() => setMode({ type: "list" })}
                         submitLabel={t("common.save")}
@@ -168,6 +206,13 @@ export function AdminAppointmentsPage() {
                             <option value="all">{t("adminAppointments.filterAll")}</option>
                         </select>
                     </label>
+                    <AppTextField
+                        label={t("adminAppointments.dateFilterLabel")}
+                        name="appointmentDateFilter"
+                        type="date"
+                        value={dateFilter}
+                        onChange={(event) => setDateFilter(event.target.value)}
+                    />
                 </header>
 
                 {appointmentsQuery.isLoading ? <p>{t("common.loading")}</p> : null}

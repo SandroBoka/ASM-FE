@@ -1,59 +1,49 @@
 # ASM-FE
 
-Frontend application for the FER Information Systems course project, implemented as a React + TypeScript solution for the ASM auto service system.
+Frontend application for the FER Information Systems course project. The app is a React + TypeScript client for an auto service management system, covering customer reservations and employee workflows.
 
-The project uses Vite for the local development server and production build.
+The project uses Vite for local development and production builds, TanStack Query for server state, React Router for navigation, and Vitest with Testing Library for UI tests.
 
 ## Requirements
 
 - Node.js 20 or newer
-- `npm`
-- Running ASM backend for features that use real API endpoints
+- npm
+- Running ASM backend for real API data
 
-## Technology Stack
+## Setup
 
-- React
-- TypeScript
-- Vite
-- React Router
-- TanStack Query
-- React Hook Form
-- Zod
-- lucide-react
-- Vitest
-- Testing Library
-- MSW
-- ESLint
-- Prettier
-
-## Installation
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-## Environment
-
-Create a `.env.local` file in the project root:
+Create `.env.local` in the project root:
 
 ```env
 VITE_API_BASE_URL=http://127.0.0.1:8000
 VITE_APP_LOCALE=hr
 ```
 
-## Running the Application
+`VITE_API_BASE_URL` points to the backend API. If it is not set, the frontend falls back to `http://127.0.0.1:8000`.
+
+`VITE_APP_LOCALE` controls the UI language. The app currently contains Croatian and English translations, with Croatian as the fallback.
+
+## Running
+
+Start the development server:
 
 ```bash
 npm run dev
 ```
 
-The Vite development server will print the local application URL, usually:
+Vite will print the local URL, usually:
 
 ```txt
 http://localhost:5173
 ```
 
-## Available Scripts
+## Scripts
 
 ```bash
 npm run dev
@@ -71,154 +61,202 @@ npm run preview
 
 `npm run check` formats the code, applies automatic ESLint fixes, runs TypeScript checks, and runs the test suite.
 
-## Application Architecture
+## Tech Stack
 
-The frontend uses **Vertical Slice Architecture**.
+- React 19
+- TypeScript
+- Vite
+- React Router
+- TanStack Query
+- i18next and react-i18next
+- React Hook Form and Zod
+- lucide-react
+- Vitest
+- Testing Library
+- MSW
+- ESLint
+- Prettier
 
-The application is organized around business features instead of global technical layers. Each feature owns the code needed for that part of the system, such as UI, models, API calls, services, storage, hooks, and validation. Shared infrastructure stays outside feature folders.
+## Application Structure
 
-Current high-level structure:
+The frontend is organized with vertical feature slices. Shared infrastructure lives in `src/app`, while each business area owns its UI, hooks, API adapter, and models.
 
 ```txt
 src/app/
-  api/                 shared HTTP infrastructure
-  components/ui/       reusable UI components
+  api/                 shared HTTP client
+  components/ui/       reusable UI primitives
   features/            vertical feature slices
-  localization/        i18next setup
-  router/              route definitions and route guards
-  App.tsx              provider composition and router mounting
+  localization/        i18next resources and setup
+  router/              routes, layout, and guards
+  App.tsx              provider composition
   main.tsx             React entry point
   styles.css           global styles and design tokens
+
+src/tests/
+  app/features/        UI tests grouped by feature
+  testUtils/           shared render helpers
+  setupTests.ts        Vitest setup
 ```
 
 Current feature slices:
 
 ```txt
-features/auth/
-  api/                 auth backend calls
-  context/             auth provider and context
-  hooks/               auth React hooks
-  models/              auth DTO and user types
-  service/             auth application flow
-  storage/             local auth session storage
-  ui/                  login and registration pages
-
-features/home/
-  HomePage.tsx         temporary protected home screen
+features/auth/                 login, logout, session storage, customer registration
+features/home/                 role-aware home dashboard and quick actions
+features/services/             service catalog CRUD for employees, read-only browsing for customers
+features/vehicles/             customer vehicle CRUD
+features/appointments/         employee appointment management
+features/reservations/         customer reservations and employee processing
+features/appointmentChanges/   customer appointment change requests and employee decisions
+features/notifications/        customer notifications and read state
+features/persons/              customer and employee lookup helpers
 ```
 
-Shared infrastructure:
+## Routing
 
-- `App.tsx` composes `QueryClientProvider`, `AuthProvider`, and `RouterProvider`.
-- `router` defines public and protected routes.
-- `AuthRoutes` centralizes route protection through `ProtectedRoute` and `GuestRoute`.
-- `httpClient` centralizes backend communication.
-- `localization/i18n` configures Croatian and English UI text.
-- `components/ui` contains reusable form and feedback components.
-
-Planned business slices:
+Public routes:
 
 ```txt
-features/services/       service catalog / sifrarnik usluga
-features/reservations/   reservation master-detail screen
-features/vehicles/       vehicle-related UI and dropdown data
+/login
+/register
 ```
 
-## Folder Responsibilities
-
-The `src/app` folder contains the frontend application. It owns the React entry point, application composition, routing, shared infrastructure, global styles, localization, reusable UI components, and feature slices.
-
-The `src/app/api` folder contains shared backend infrastructure. `httpClient` centralizes low-level HTTP behavior. Feature-specific API modules live inside their feature slices, for example `features/auth/api/authApi.ts`.
-
-The `src/app/components/ui` folder contains reusable visual components such as buttons, text fields, alerts, and form layout components. These components do not own business logic.
-
-The `src/app/features` folder contains vertical slices. Each feature should keep its related UI, models, services, API adapters, hooks, storage, repositories, and validation close together.
-
-The `src/app/localization` folder contains i18next configuration and translation resources. The default locale is Croatian.
-
-The `src/app/router` folder contains route configuration and route guards. Protected application routes require an authenticated user, while login and registration are guest routes.
-
-The `src/tests` folder mirrors important parts of the application structure and contains Vitest tests, test utilities, and global test setup.
-
-## Authentication Flow
-
-Implementation:
-
-- `features/auth/api/authApi.ts` sends login, logout, current-user, and registration requests to the backend.
-- `features/auth/service/authService.ts` coordinates login, registration, logout, session creation, and session cleanup.
-- `features/auth/storage/authStorage.ts` stores the current auth session in `localStorage`.
-- `features/auth/context/authContext.tsx` exposes the current user and auth actions through `AuthProvider`.
-- `features/auth/hooks/useAuth.ts` provides a small hook for consuming auth context.
-- `features/auth/ui/LoginPage.tsx` and `RegisterPage.tsx` contain the current auth screens.
-- `api/httpClient.ts` attaches access tokens, refreshes expired sessions, retries authenticated requests once after `401`, and clears the session when refresh fails.
-
-Backend routes currently used by the frontend auth foundation:
+Authenticated routes:
 
 ```txt
-POST /persons/customers
-POST /auth/login
-POST /auth/logout
-POST /auth/refresh
-GET  /auth/me
+/                         home
+/services                 service catalog
+/reservations             reservation list
+/reservations/new         new reservation
+/reservations/:id         reservation details
+/reservations/:id/edit    edit pending reservation
+/vehicles                 customer vehicle management
 ```
 
-Logout is sent as a public request with the refresh token in the body because the backend logout route does not require an authenticated user dependency.
+Customer-only route:
+
+```txt
+/notifications
+```
+
+Employee-only routes:
+
+```txt
+/pending-reservations     pending reservation and appointment-change requests
+/admin/appointments       appointment management
+```
+
+The navigation adapts to the signed-in user type. Customers see vehicles and notifications; employees see pending work and appointment administration.
+
+## Main Workflows
+
+### Authentication
+
+- Customers can register.
+- Users can sign in and sign out.
+- Auth sessions are saved in local storage.
+- The HTTP client refreshes expired access tokens with the refresh token and retries authenticated requests once after a `401`.
+
+### Services
+
+- Customers can browse the service catalog.
+- Employees can create, edit, delete, and search services.
+- Services include name, description, duration, and price.
+
+### Vehicles
+
+- Customers can manage their own vehicles.
+- Vehicle forms validate year ranges.
+- Employee users see an access message instead of customer vehicle editing.
+
+### Appointments
+
+- Employees can view appointment slots, filter by status, and filter by an exact date.
+- Admin and manager employees can add, edit, and delete non-booked appointments.
+- Adding a single appointment keeps the existing manual date/time/status flow.
+- The "full working day free" option creates one-hour free slots from `08:00` to `20:00` instead of creating one long appointment.
+
+### Reservations
+
+- Customers can create reservations by selecting a vehicle, appointment, service rows, mileage, and problem description.
+- The form calculates total service duration and price.
+- Reservation creation is blocked when selected services exceed the selected appointment duration.
+- Customers can edit reservations while they are still pending.
+- Employees can view pending reservations, approve or reject them with an optional comment, and mark approved reservations as completed.
+
+### Appointment Change Requests
+
+- Customers can propose a new free appointment for an existing reservation.
+- Employees can accept or reject pending appointment-change requests.
+- Pending reservation and change request counts are shown in the employee navigation.
+
+### Notifications
+
+- Customers can view notifications.
+- Unread notification count is shown in navigation.
+- Notifications can be marked as read.
 
 ## HTTP Client
 
-The HTTP client:
+`src/app/api/httpClient.ts` centralizes backend communication.
 
-- reads the backend base URL from `VITE_API_BASE_URL`
-- sends JSON request bodies
-- parses JSON responses
+It:
+
+- reads `VITE_API_BASE_URL`
+- sends and receives JSON
 - supports `204 No Content`
-- attaches the access token for authenticated requests
-- refreshes the access token when the stored session is expired
+- attaches the bearer access token for authenticated requests
+- refreshes expired sessions with `/auth/refresh`
 - retries authenticated requests once after a `401`
-- clears the local session when refresh fails
-- throws an `ApiError` containing the HTTP status and backend response body
+- clears local auth state when refresh fails
+- throws `ApiError` with HTTP status and backend response body
 
-Public requests can opt out of authentication with:
+Public requests can opt out of authentication:
 
 ```ts
 authenticated: false;
 ```
 
+## Testing
+
+Vitest runs in the `jsdom` environment with Testing Library matchers.
+
+Current tests cover:
+
+- login and registration pages
+- service form and service catalog page
+- vehicle form and vehicle management page
+- appointment form and appointment administration page
+- new reservation flow
+- edit reservation flow
+- reservation list and reservation details
+- pending reservation processing
+- appointment change proposal UI
+- notifications page
+
+Run tests:
+
+```bash
+npm test
+```
+
+Run tests in watch mode:
+
+```bash
+npm run test:watch
+```
+
 ## Formatting And Checks
 
-Formatting is handled by Prettier. The current configuration uses:
+Prettier is configured with:
 
 - semicolons
 - double quotes
 - 4-space indentation
 - trailing commas
 
-The main verification command is:
+Recommended verification before submitting work:
 
 ```bash
 npm run check
 ```
-
-## Testing
-
-Vitest is configured with the `jsdom` environment and Testing Library matchers.
-
-Current test setup:
-
-```txt
-src/tests/setupTests.ts
-src/tests/testUtils/renderAuthPage.tsx
-src/tests/app/features/auth/ui/LoginPage.test.tsx
-src/tests/app/features/auth/ui/RegisterPage.test.tsx
-```
-
-The test folder mirrors application structure where useful. Current auth tests cover login and registration UI behavior using a mocked auth context.
-
-Planned tests for business features:
-
-- presentation tests for pages, forms, and controllers
-- business logic tests for services, use cases, and validation rules
-- data access tests for API adapters, repositories, and local storage adapters
-- integration tests proving that feature UI, business logic, and data access are connected
-
-Even though the frontend uses Vertical Slice Architecture, each business slice should still expose testable presentation, business, and data-access responsibilities.

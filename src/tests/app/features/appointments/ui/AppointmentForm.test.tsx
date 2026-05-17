@@ -47,6 +47,31 @@ describe("AppointmentForm", () => {
         });
     });
 
+    it("submits a full working-day free appointment when selected", async () => {
+        const user = userEvent.setup();
+        const { onSubmit } = renderForm({ allowFullDayFree: true });
+
+        await user.type(screen.getByLabelText("Datum"), "2026-06-15");
+        await user.click(screen.getByRole("checkbox", { name: /Cijeli radni dan slobodan/ }));
+
+        expect(screen.getByLabelText("Vrijeme od")).toHaveValue("08:00");
+        expect(screen.getByLabelText("Vrijeme od")).toBeDisabled();
+        expect(screen.getByLabelText("Vrijeme do")).toHaveValue("20:00");
+        expect(screen.getByLabelText("Vrijeme do")).toBeDisabled();
+        expect(screen.getByLabelText("Status")).toHaveValue("slobodan");
+        expect(screen.getByLabelText("Status")).toBeDisabled();
+
+        await user.click(screen.getByRole("button", { name: "Spremi" }));
+
+        expect(onSubmit).toHaveBeenCalledWith({
+            Datum: "2026-06-15",
+            VrijemeOd: "08:00",
+            VrijemeDo: "20:00",
+            Status: "slobodan",
+            createHourlySlots: true,
+        });
+    });
+
     it("shows validation error when vrijemeDo is not after vrijemeOd", async () => {
         const user = userEvent.setup();
         const onSubmit = vi.fn();
