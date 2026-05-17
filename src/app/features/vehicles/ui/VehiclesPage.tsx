@@ -12,10 +12,7 @@ import {
 import type { Vehicle } from "../models/vehicleTypes";
 import { VehicleForm, type VehicleFormValues } from "./VehicleForm";
 
-type Mode =
-    | { type: "list" }
-    | { type: "create" }
-    | { type: "edit"; vehicle: Vehicle };
+type Mode = { type: "list" } | { type: "create" } | { type: "edit"; vehicle: Vehicle };
 
 function getErrorMessage(error: unknown, fallback: string): string | null {
     if (!error) {
@@ -83,14 +80,8 @@ export function VehiclesPage() {
         deleteMutation.mutate(vehicle.IdVozila);
     }
 
-    const fetchErrorMessage = getErrorMessage(
-        vehiclesQuery.error,
-        t("common.unknownError"),
-    );
-    const deleteErrorMessage = getErrorMessage(
-        deleteMutation.error,
-        t("common.unknownError"),
-    );
+    const fetchErrorMessage = getErrorMessage(vehiclesQuery.error, t("common.unknownError"));
+    const deleteErrorMessage = getErrorMessage(deleteMutation.error, t("common.unknownError"));
 
     return (
         <section className="page">

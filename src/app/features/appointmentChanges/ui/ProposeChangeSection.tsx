@@ -71,9 +71,7 @@ export function ProposeChangeSection({ reservation }: Props) {
     }
 
     if (createMutation.isSuccess) {
-        return (
-            <Alert variant="info">{t("appointmentChanges.requestSent")}</Alert>
-        );
+        return <Alert variant="info">{t("appointmentChanges.requestSent")}</Alert>;
     }
 
     if (!isOpen) {
@@ -143,9 +141,7 @@ export function ProposeChangeSection({ reservation }: Props) {
                                     className={`appointment-list__item ${
                                         selected ? "appointment-list__item--selected" : ""
                                     }`}
-                                    onClick={() =>
-                                        setSelectedAppointmentId(appointment.IdTermina)
-                                    }
+                                    onClick={() => setSelectedAppointmentId(appointment.IdTermina)}
                                 >
                                     <span className="appointment-list__date">
                                         {formatDate(appointment.Datum)}
@@ -182,9 +178,7 @@ export function ProposeChangeSection({ reservation }: Props) {
                 <AppButton
                     onClick={handleSubmit}
                     disabled={
-                        selectedAppointmentId === null ||
-                        createMutation.isPending ||
-                        exceedsSlot
+                        selectedAppointmentId === null || createMutation.isPending || exceedsSlot
                     }
                 >
                     {createMutation.isPending

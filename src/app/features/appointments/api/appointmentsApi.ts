@@ -15,9 +15,7 @@ export function getFreeAppointments(filter: AppointmentFreeFilter = {}): Promise
         params.set("date_to", filter.dateTo);
     }
     const query = params.toString();
-    return httpClient<Appointment[]>(
-        `/appointments/free${query ? `?${query}` : ""}`,
-    );
+    return httpClient<Appointment[]>(`/appointments/free${query ? `?${query}` : ""}`);
 }
 
 export function getAllAppointments(): Promise<Appointment[]> {

@@ -40,7 +40,7 @@ function getErrorMessage(error: unknown, fallback: string): string {
 export function PendingReservationsPage() {
     const { t } = useTranslation();
     const pendingQuery = usePendingReservations();
-    const reservations = pendingQuery.data ?? [];
+    const reservations = useMemo(() => pendingQuery.data ?? [], [pendingQuery.data]);
 
     const appointmentQueries = useQueries({
         queries: reservations.map((reservation) => ({
@@ -105,20 +105,13 @@ export function PendingReservationsPage() {
         return [...reservations].sort((a, b) => {
             const aAppointment = appointmentsById.get(a.IdTermina);
             const bAppointment = appointmentsById.get(b.IdTermina);
-            const aKey = aAppointment
-                ? `${aAppointment.Datum}T${aAppointment.VrijemeOd}`
-                : "";
-            const bKey = bAppointment
-                ? `${bAppointment.Datum}T${bAppointment.VrijemeOd}`
-                : "";
+            const aKey = aAppointment ? `${aAppointment.Datum}T${aAppointment.VrijemeOd}` : "";
+            const bKey = bAppointment ? `${bAppointment.Datum}T${bAppointment.VrijemeOd}` : "";
             return aKey.localeCompare(bKey);
         });
     }, [reservations, appointmentsById]);
 
-    const fetchErrorMessage = getErrorMessage(
-        pendingQuery.error,
-        t("common.unknownError"),
-    );
+    const fetchErrorMessage = getErrorMessage(pendingQuery.error, t("common.unknownError"));
 
     return (
         <section className="page">
@@ -171,7 +164,7 @@ export function PendingReservationsPage() {
 function PendingChangesSection() {
     const { t } = useTranslation();
     const changesQuery = usePendingChanges();
-    const changes = changesQuery.data ?? [];
+    const changes = useMemo(() => changesQuery.data ?? [], [changesQuery.data]);
 
     const appointmentIds = useMemo(() => {
         const ids = new Set<number>();
@@ -291,7 +284,7 @@ function PendingChangesSection() {
                             ? customersById.get(reservation.IdOsobe_Korisnik)
                             : undefined;
                         const vehicle = reservation
-                            ? vehiclesByIdLocal.get(reservation.IdVozila) ?? null
+                            ? (vehiclesByIdLocal.get(reservation.IdVozila) ?? null)
                             : null;
                         return (
                             <PendingChangeItem
@@ -403,9 +396,7 @@ function PendingChangeItem({
                 <dl className="summary">
                     <dt>{t("reservations.fields.vehicle")}</dt>
                     <dd>
-                        {vehicle
-                            ? `${vehicle.Marka} ${vehicle.Model} (${vehicle.RegOznaka})`
-                            : "—"}
+                        {vehicle ? `${vehicle.Marka} ${vehicle.Model} (${vehicle.RegOznaka})` : "—"}
                     </dd>
 
                     <dt>{t("reservations.fields.kilometers")}</dt>
@@ -460,11 +451,7 @@ function PendingChangeItem({
                 <AppButton onClick={handleAccept} disabled={inFlight}>
                     {t("appointmentChanges.acceptAction")}
                 </AppButton>
-                <AppButton
-                    variant="destructive"
-                    onClick={handleReject}
-                    disabled={inFlight}
-                >
+                <AppButton variant="destructive" onClick={handleReject} disabled={inFlight}>
                     {t("appointmentChanges.rejectAction")}
                 </AppButton>
             </div>
@@ -479,12 +466,7 @@ type PendingItemProps = {
     customer: Customer | null;
 };
 
-function PendingReservationItem({
-    reservation,
-    appointment,
-    vehicle,
-    customer,
-}: PendingItemProps) {
+function PendingReservationItem({ reservation, appointment, vehicle, customer }: PendingItemProps) {
     const { t } = useTranslation();
     return (
         <li className="reservation-list__item">
@@ -507,9 +489,7 @@ function PendingReservationItem({
             </div>
 
             <div className="reservation-list__body">
-                <div className="reservation-list__problem">
-                    {reservation.OpisProblema || "—"}
-                </div>
+                <div className="reservation-list__problem">{reservation.OpisProblema || "—"}</div>
                 <div className="reservation-list__meta">
                     <span>
                         {vehicle

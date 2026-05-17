@@ -9,10 +9,7 @@ import type { Appointment } from "../../appointments/models/appointmentTypes";
 import { useChangesForReservation } from "../../appointmentChanges/hooks/useAppointmentChanges";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { useVehiclesByCustomerId } from "../../vehicles/hooks/useVehicles";
-import {
-    useAllReservations,
-    useReservationsByCustomer,
-} from "../hooks/useReservations";
+import { useAllReservations, useReservationsByCustomer } from "../hooks/useReservations";
 import type { Reservation, ReservationStatus } from "../models/reservationTypes";
 
 function formatDate(value: string): string {
@@ -40,6 +37,8 @@ const STATUS_MODIFIERS: Record<ReservationStatus, string> = {
     zavrsena: "status-pill--completed",
 };
 
+const ACTIVE_STATUSES: ReservationStatus[] = ["na cekanju", "odobrena"];
+
 function StatusPill({ status }: { status: ReservationStatus }) {
     const { t } = useTranslation();
     return (
@@ -57,16 +56,14 @@ export function ReservationsPage() {
     const isEmployee = user?.TipKorisnika === "employee";
 
     const customerReservations = useReservationsByCustomer(
-        isCustomer ? user?.IdOsobe ?? null : null,
+        isCustomer ? (user?.IdOsobe ?? null) : null,
     );
     const employeeReservations = useAllReservations(isEmployee);
     const reservationsQuery = isCustomer ? customerReservations : employeeReservations;
 
-    const vehiclesQuery = useVehiclesByCustomerId(
-        isCustomer ? user?.IdOsobe ?? null : null,
-    );
+    const vehiclesQuery = useVehiclesByCustomerId(isCustomer ? (user?.IdOsobe ?? null) : null);
 
-    const reservations = reservationsQuery.data ?? [];
+    const reservations = useMemo(() => reservationsQuery.data ?? [], [reservationsQuery.data]);
 
     const appointmentQueries = useQueries({
         queries: reservations.map((reservation) => ({
@@ -84,8 +81,6 @@ export function ReservationsPage() {
         });
         return map;
     }, [appointmentQueries, reservations]);
-
-    const ACTIVE_STATUSES: ReservationStatus[] = ["na cekanju", "odobrena"];
 
     const { upcomingReservations, pastReservations } = useMemo(() => {
         function sortKey(reservation: Reservation): string {
@@ -113,10 +108,7 @@ export function ReservationsPage() {
         (vehiclesQuery.data ?? []).map((vehicle) => [vehicle.IdVozila, vehicle]),
     );
 
-    const fetchErrorMessage = getErrorMessage(
-        reservationsQuery.error,
-        t("common.unknownError"),
-    );
+    const fetchErrorMessage = getErrorMessage(reservationsQuery.error, t("common.unknownError"));
 
     return (
         <section className="page">
@@ -158,11 +150,7 @@ export function ReservationsPage() {
                                 key={reservation.IdRezervacije}
                                 reservation={reservation}
                                 appointment={appointmentsById.get(reservation.IdTermina) ?? null}
-                                vehicleLabel={buildVehicleLabel(
-                                    reservation,
-                                    vehiclesById,
-                                    t,
-                                )}
+                                vehicleLabel={buildVehicleLabel(reservation, vehiclesById, t)}
                             />
                         ))}
                     </ul>
@@ -178,11 +166,7 @@ export function ReservationsPage() {
                                 key={reservation.IdRezervacije}
                                 reservation={reservation}
                                 appointment={appointmentsById.get(reservation.IdTermina) ?? null}
-                                vehicleLabel={buildVehicleLabel(
-                                    reservation,
-                                    vehiclesById,
-                                    t,
-                                )}
+                                vehicleLabel={buildVehicleLabel(reservation, vehiclesById, t)}
                             />
                         ))}
                     </ul>
@@ -239,9 +223,7 @@ function ReservationListItem({ reservation, appointment, vehicleLabel }: Reserva
             </div>
 
             <div className="reservation-list__body">
-                <div className="reservation-list__problem">
-                    {reservation.OpisProblema || "—"}
-                </div>
+                <div className="reservation-list__problem">{reservation.OpisProblema || "—"}</div>
                 <div className="reservation-list__meta">
                     <span>{vehicleLabel}</span>
                     <span>

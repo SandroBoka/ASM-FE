@@ -29,8 +29,7 @@ export function AppLayout() {
         refetchInterval: 10_000,
     });
     const pendingCount =
-        (pendingReservationsQuery.data?.length ?? 0) +
-        (pendingChangesQuery.data?.length ?? 0);
+        (pendingReservationsQuery.data?.length ?? 0) + (pendingChangesQuery.data?.length ?? 0);
 
     if (!user) {
         return null;
@@ -52,9 +51,7 @@ export function AppLayout() {
                     <NavLink to="/" end>
                         {t("app.home")}
                     </NavLink>
-                    {!isEmployee && (
-                        <NavLink to="/vehicles">{t("app.vehicles")}</NavLink>
-                    )}
+                    {!isEmployee && <NavLink to="/vehicles">{t("app.vehicles")}</NavLink>}
                     <NavLink to="/reservations">{t("app.reservations")}</NavLink>
                     <NavLink to="/services">{t("app.services")}</NavLink>
 
@@ -78,9 +75,7 @@ export function AppLayout() {
                                     <span className="nav-badge">{pendingCount}</span>
                                 ) : null}
                             </NavLink>
-                            <NavLink to="/admin/appointments">
-                                {t("app.adminAppointments")}
-                            </NavLink>
+                            <NavLink to="/admin/appointments">{t("app.adminAppointments")}</NavLink>
                         </>
                     )}
                 </nav>

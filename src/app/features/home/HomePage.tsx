@@ -15,7 +15,7 @@ export function HomePage() {
     const isEmployee = user?.TipKorisnika === "employee";
 
     const customerReservationsQuery = useReservationsByCustomer(
-        isCustomer ? user?.IdOsobe ?? null : null,
+        isCustomer ? (user?.IdOsobe ?? null) : null,
     );
     const unreadQuery = useUnreadNotifications(isCustomer);
     const pendingReservationsQuery = usePendingReservations(isEmployee);
@@ -35,9 +35,7 @@ export function HomePage() {
     return (
         <section className="page">
             <header className="dashboard-hero">
-                <h1>
-                    {t("home.greeting", { name: user.Ime })}
-                </h1>
+                <h1>{t("home.greeting", { name: user.Ime })}</h1>
                 <p className="muted-hint">
                     {isCustomer ? t("home.customerSubtitle") : t("home.employeeSubtitle")}
                 </p>
@@ -47,9 +45,7 @@ export function HomePage() {
                 <>
                     <section className="dashboard-stats">
                         <Link to="/reservations" className="dashboard-stat">
-                            <span className="dashboard-stat__value">
-                                {activeReservationsCount}
-                            </span>
+                            <span className="dashboard-stat__value">{activeReservationsCount}</span>
                             <span className="dashboard-stat__label">
                                 {t("home.stats.activeReservations")}
                             </span>
@@ -102,9 +98,7 @@ export function HomePage() {
                             </span>
                         </Link>
                         <Link to="/pending-reservations" className="dashboard-stat">
-                            <span className="dashboard-stat__value">
-                                {pendingChangesCount}
-                            </span>
+                            <span className="dashboard-stat__value">{pendingChangesCount}</span>
                             <span className="dashboard-stat__label">
                                 {t("home.stats.pendingChanges")}
                             </span>

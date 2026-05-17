@@ -18,12 +18,8 @@ export function getPendingChanges(): Promise<AppointmentChange[]> {
     return httpClient<AppointmentChange[]>("/appointment-changes/pending");
 }
 
-export function getChangesForReservation(
-    reservationId: number,
-): Promise<AppointmentChange[]> {
-    return httpClient<AppointmentChange[]>(
-        `/appointment-changes/reservation/${reservationId}`,
-    );
+export function getChangesForReservation(reservationId: number): Promise<AppointmentChange[]> {
+    return httpClient<AppointmentChange[]>(`/appointment-changes/reservation/${reservationId}`);
 }
 
 export function getAllChanges(): Promise<AppointmentChange[]> {

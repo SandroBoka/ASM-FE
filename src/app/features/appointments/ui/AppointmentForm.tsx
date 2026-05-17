@@ -34,15 +34,9 @@ export function AppointmentForm({
 }: Props) {
     const { t } = useTranslation();
     const [datum, setDatum] = useState(initialValues?.Datum ?? "");
-    const [vrijemeOd, setVrijemeOd] = useState(
-        initialValues?.VrijemeOd?.slice(0, 5) ?? "",
-    );
-    const [vrijemeDo, setVrijemeDo] = useState(
-        initialValues?.VrijemeDo?.slice(0, 5) ?? "",
-    );
-    const [status, setStatus] = useState<AppointmentStatus>(
-        initialValues?.Status ?? "slobodan",
-    );
+    const [vrijemeOd, setVrijemeOd] = useState(initialValues?.VrijemeOd?.slice(0, 5) ?? "");
+    const [vrijemeDo, setVrijemeDo] = useState(initialValues?.VrijemeDo?.slice(0, 5) ?? "");
+    const [status, setStatus] = useState<AppointmentStatus>(initialValues?.Status ?? "slobodan");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -61,7 +55,12 @@ export function AppointmentForm({
 
         setIsSubmitting(true);
         try {
-            await onSubmit({ Datum: datum, VrijemeOd: vrijemeOd, VrijemeDo: vrijemeDo, Status: status });
+            await onSubmit({
+                Datum: datum,
+                VrijemeOd: vrijemeOd,
+                VrijemeDo: vrijemeDo,
+                Status: status,
+            });
         } finally {
             setIsSubmitting(false);
         }

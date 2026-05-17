@@ -12,10 +12,7 @@ import {
 import type { Service } from "../models/serviceTypes";
 import { ServiceForm, type ServiceFormValues } from "./ServiceForm";
 
-type Mode =
-    | { type: "list" }
-    | { type: "create" }
-    | { type: "edit"; service: Service };
+type Mode = { type: "list" } | { type: "create" } | { type: "edit"; service: Service };
 
 function getErrorMessage(error: unknown, fallback: string): string | null {
     if (!error) {
@@ -71,14 +68,8 @@ export function ServicesPage() {
         deleteMutation.mutate(service.IdUsluge);
     }
 
-    const fetchErrorMessage = getErrorMessage(
-        servicesQuery.error,
-        t("common.unknownError"),
-    );
-    const deleteErrorMessage = getErrorMessage(
-        deleteMutation.error,
-        t("common.unknownError"),
-    );
+    const fetchErrorMessage = getErrorMessage(servicesQuery.error, t("common.unknownError"));
+    const deleteErrorMessage = getErrorMessage(deleteMutation.error, t("common.unknownError"));
 
     return (
         <section className="page">
@@ -163,9 +154,7 @@ export function ServicesPage() {
                                 </div>
 
                                 {service.Opis ? (
-                                    <p className="service-list__description">
-                                        {service.Opis}
-                                    </p>
+                                    <p className="service-list__description">{service.Opis}</p>
                                 ) : null}
 
                                 <span className="service-list__duration">
@@ -178,9 +167,7 @@ export function ServicesPage() {
                                     <div className="service-list__actions">
                                         <AppButton
                                             variant="secondary"
-                                            onClick={() =>
-                                                setMode({ type: "edit", service })
-                                            }
+                                            onClick={() => setMode({ type: "edit", service })}
                                         >
                                             {t("common.edit")}
                                         </AppButton>

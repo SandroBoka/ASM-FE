@@ -12,10 +12,7 @@ import {
 import type { Appointment, AppointmentStatus } from "../models/appointmentTypes";
 import { AppointmentForm, type AppointmentFormValues } from "./AppointmentForm";
 
-type Mode =
-    | { type: "list" }
-    | { type: "create" }
-    | { type: "edit"; appointment: Appointment };
+type Mode = { type: "list" } | { type: "create" } | { type: "edit"; appointment: Appointment };
 
 type StatusFilter = "slobodan" | "all";
 
@@ -56,6 +53,17 @@ export function AdminAppointmentsPage() {
     const updateMutation = useUpdateAppointment();
     const deleteMutation = useDeleteAppointment();
 
+    const sortedAppointments = useMemo(() => {
+        const data = appointmentsQuery.data ?? [];
+        const filtered =
+            statusFilter === "all" ? data : data.filter((a) => a.Status === statusFilter);
+        return filtered.sort((a, b) => {
+            const aKey = `${a.Datum}T${a.VrijemeOd}`;
+            const bKey = `${b.Datum}T${b.VrijemeOd}`;
+            return aKey.localeCompare(bKey);
+        });
+    }, [appointmentsQuery.data, statusFilter]);
+
     if (!user) {
         return null;
     }
@@ -89,17 +97,6 @@ export function AdminAppointmentsPage() {
         if (!confirmed) return;
         deleteMutation.mutate(appointment.IdTermina);
     }
-
-    const sortedAppointments = useMemo(() => {
-        const data = appointmentsQuery.data ?? [];
-        const filtered =
-            statusFilter === "all" ? data : data.filter((a) => a.Status === statusFilter);
-        return filtered.sort((a, b) => {
-            const aKey = `${a.Datum}T${a.VrijemeOd}`;
-            const bKey = `${b.Datum}T${b.VrijemeOd}`;
-            return aKey.localeCompare(bKey);
-        });
-    }, [appointmentsQuery.data, statusFilter]);
 
     const deleteErrorMessage = getErrorMessage(deleteMutation.error, t("common.unknownError"));
 
@@ -167,12 +164,8 @@ export function AdminAppointmentsPage() {
                                 setStatusFilter(event.target.value as StatusFilter)
                             }
                         >
-                            <option value="slobodan">
-                                {t("adminAppointments.filterFree")}
-                            </option>
-                            <option value="all">
-                                {t("adminAppointments.filterAll")}
-                            </option>
+                            <option value="slobodan">{t("adminAppointments.filterFree")}</option>
+                            <option value="all">{t("adminAppointments.filterAll")}</option>
                         </select>
                     </label>
                 </header>
@@ -222,9 +215,7 @@ export function AdminAppointmentsPage() {
                                     <div className="appointment-admin-list__actions">
                                         <AppButton
                                             variant="secondary"
-                                            onClick={() =>
-                                                setMode({ type: "edit", appointment })
-                                            }
+                                            onClick={() => setMode({ type: "edit", appointment })}
                                         >
                                             {t("common.edit")}
                                         </AppButton>

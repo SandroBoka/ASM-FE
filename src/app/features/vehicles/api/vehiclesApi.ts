@@ -1,9 +1,5 @@
 import { httpClient } from "../../../api/httpClient";
-import type {
-    Vehicle,
-    VehicleCreatePayload,
-    VehicleUpdatePayload,
-} from "../models/vehicleTypes";
+import type { Vehicle, VehicleCreatePayload, VehicleUpdatePayload } from "../models/vehicleTypes";
 
 export function getVehiclesByCustomerId(customerId: number): Promise<Vehicle[]> {
     return httpClient<Vehicle[]>(`/vehicles/customers/${customerId}`);
@@ -20,10 +16,7 @@ export function createVehicle(payload: VehicleCreatePayload): Promise<Vehicle> {
     });
 }
 
-export function updateVehicle(
-    vehicleId: number,
-    payload: VehicleUpdatePayload,
-): Promise<Vehicle> {
+export function updateVehicle(vehicleId: number, payload: VehicleUpdatePayload): Promise<Vehicle> {
     return httpClient<Vehicle>(`/vehicles/${vehicleId}`, {
         method: "PUT",
         body: payload,

@@ -83,6 +83,31 @@ export function NewReservationPage() {
         Boolean(user) && state.step === 1,
     );
 
+    const selectedAppointment =
+        appointmentsQuery.data?.find((a) => a.IdTermina === state.appointmentId) ?? null;
+    const selectedVehicle = vehiclesQuery.data?.find((v) => v.IdVozila === state.vehicleId) ?? null;
+    const selectedServicesList = useMemo(() => {
+        if (!servicesQuery.data) {
+            return [] as { service: Service; quantity: number }[];
+        }
+        return Object.entries(state.selectedServices)
+            .map(([id, quantity]) => {
+                const service = servicesQuery.data!.find((s) => s.IdUsluge === Number(id));
+                return service ? { service, quantity } : null;
+            })
+            .filter((entry): entry is { service: Service; quantity: number } => entry !== null);
+    }, [servicesQuery.data, state.selectedServices]);
+
+    const totals = useMemo(() => {
+        return selectedServicesList.reduce(
+            (acc, { service, quantity }) => ({
+                duration: acc.duration + service.Trajanje * quantity,
+                price: acc.price + Number(service.Cijena) * quantity,
+            }),
+            { duration: 0, price: 0 },
+        );
+    }, [selectedServicesList]);
+
     if (!user) {
         return null;
     }
@@ -107,34 +132,6 @@ export function NewReservationPage() {
             maxStepReached: (step > prev.maxStepReached ? step : prev.maxStepReached) as WizardStep,
         }));
     }
-
-    const selectedAppointment =
-        appointmentsQuery.data?.find((a) => a.IdTermina === state.appointmentId) ?? null;
-    const selectedVehicle =
-        vehiclesQuery.data?.find((v) => v.IdVozila === state.vehicleId) ?? null;
-    const selectedServicesList = useMemo(() => {
-        if (!servicesQuery.data) {
-            return [] as { service: Service; quantity: number }[];
-        }
-        return Object.entries(state.selectedServices)
-            .map(([id, quantity]) => {
-                const service = servicesQuery.data!.find(
-                    (s) => s.IdUsluge === Number(id),
-                );
-                return service ? { service, quantity } : null;
-            })
-            .filter((entry): entry is { service: Service; quantity: number } => entry !== null);
-    }, [servicesQuery.data, state.selectedServices]);
-
-    const totals = useMemo(() => {
-        return selectedServicesList.reduce(
-            (acc, { service, quantity }) => ({
-                duration: acc.duration + service.Trajanje * quantity,
-                price: acc.price + Number(service.Cijena) * quantity,
-            }),
-            { duration: 0, price: 0 },
-        );
-    }, [selectedServicesList]);
 
     async function handleSubmit() {
         if (!state.appointmentId || !state.vehicleId) {
@@ -244,13 +241,14 @@ export function NewReservationPage() {
                     totalDuration={totals.duration}
                     onToggleService={(serviceId, quantity) =>
                         updateState({
-                            selectedServices: quantity > 0
-                                ? { ...state.selectedServices, [serviceId]: quantity }
-                                : Object.fromEntries(
-                                    Object.entries(state.selectedServices).filter(
-                                        ([id]) => Number(id) !== serviceId,
-                                    ),
-                                ),
+                            selectedServices:
+                                quantity > 0
+                                    ? { ...state.selectedServices, [serviceId]: quantity }
+                                    : Object.fromEntries(
+                                          Object.entries(state.selectedServices).filter(
+                                              ([id]) => Number(id) !== serviceId,
+                                          ),
+                                      ),
                         })
                     }
                     onBack={() => goToStep(3)}
@@ -374,9 +372,7 @@ function Step1Appointment({
             {isLoading ? <p>{t("common.loading")}</p> : null}
 
             {error ? (
-                <Alert variant="error">
-                    {getErrorMessage(error, t("common.unknownError"))}
-                </Alert>
+                <Alert variant="error">{getErrorMessage(error, t("common.unknownError"))}</Alert>
             ) : null}
 
             {!isLoading && appointments.length === 0 ? (
@@ -420,10 +416,7 @@ function Step1Appointment({
             ) : null}
 
             <div className="form-actions form-actions--end">
-                <AppButton
-                    onClick={onNext}
-                    disabled={selectedAppointmentId === null}
-                >
+                <AppButton onClick={onNext} disabled={selectedAppointmentId === null}>
                     {t("reservations.wizard.next")}
                 </AppButton>
             </div>
@@ -458,9 +451,7 @@ function Step2Vehicle({
             {isLoading ? <p>{t("common.loading")}</p> : null}
 
             {error ? (
-                <Alert variant="error">
-                    {getErrorMessage(error, t("common.unknownError"))}
-                </Alert>
+                <Alert variant="error">{getErrorMessage(error, t("common.unknownError"))}</Alert>
             ) : null}
 
             {!isLoading && vehicles.length === 0 ? (
@@ -578,18 +569,14 @@ function Step3Details({
                         required
                     />
                 </label>
-                {validationError ? (
-                    <Alert variant="error">{validationError}</Alert>
-                ) : null}
+                {validationError ? <Alert variant="error">{validationError}</Alert> : null}
             </form>
 
             <div className="form-actions form-actions--between">
                 <AppButton variant="secondary" onClick={onBack}>
                     {t("reservations.wizard.back")}
                 </AppButton>
-                <AppButton onClick={handleNext}>
-                    {t("reservations.wizard.next")}
-                </AppButton>
+                <AppButton onClick={handleNext}>{t("reservations.wizard.next")}</AppButton>
             </div>
         </section>
     );
@@ -622,8 +609,7 @@ function Step4Services({
     const slotDuration = appointment
         ? durationInMinutes(appointment.VrijemeOd, appointment.VrijemeDo)
         : null;
-    const exceedsSlot =
-        slotDuration !== null && totalDuration > 0 && totalDuration > slotDuration;
+    const exceedsSlot = slotDuration !== null && totalDuration > 0 && totalDuration > slotDuration;
 
     return (
         <section className="page__section">
@@ -642,9 +628,7 @@ function Step4Services({
             {isLoading ? <p>{t("common.loading")}</p> : null}
 
             {error ? (
-                <Alert variant="error">
-                    {getErrorMessage(error, t("common.unknownError"))}
-                </Alert>
+                <Alert variant="error">{getErrorMessage(error, t("common.unknownError"))}</Alert>
             ) : null}
 
             {!isLoading && services.length === 0 ? (
@@ -715,9 +699,7 @@ function Step4Services({
                 <AppButton variant="secondary" onClick={onBack}>
                     {t("reservations.wizard.back")}
                 </AppButton>
-                <AppButton onClick={onNext}>
-                    {t("reservations.wizard.next")}
-                </AppButton>
+                <AppButton onClick={onNext}>{t("reservations.wizard.next")}</AppButton>
             </div>
         </section>
     );
@@ -771,9 +753,7 @@ function Step5Summary({
 
                 <dt>{t("reservations.fields.vehicle")}</dt>
                 <dd>
-                    {vehicle
-                        ? `${vehicle.Marka} ${vehicle.Model} (${vehicle.RegOznaka})`
-                        : "—"}
+                    {vehicle ? `${vehicle.Marka} ${vehicle.Model} (${vehicle.RegOznaka})` : "—"}
                 </dd>
 
                 <dt>{t("reservations.fields.kilometers")}</dt>
@@ -833,17 +813,10 @@ function Step5Summary({
                         {errorMessage ? <Alert variant="error">{errorMessage}</Alert> : null}
 
                         <div className="form-actions form-actions--between">
-                            <AppButton
-                                variant="secondary"
-                                onClick={onBack}
-                                disabled={isSubmitting}
-                            >
+                            <AppButton variant="secondary" onClick={onBack} disabled={isSubmitting}>
                                 {t("reservations.wizard.back")}
                             </AppButton>
-                            <AppButton
-                                onClick={onSubmit}
-                                disabled={isSubmitting || exceedsSlot}
-                            >
+                            <AppButton onClick={onSubmit} disabled={isSubmitting || exceedsSlot}>
                                 {isSubmitting
                                     ? t("reservations.wizard.submitting")
                                     : t("reservations.wizard.submit")}

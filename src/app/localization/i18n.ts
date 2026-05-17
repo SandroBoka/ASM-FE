@@ -80,11 +80,12 @@ const resources = {
                 addAction: "Dodaj vozilo",
                 addTitle: "Dodaj novo vozilo",
                 editTitle: "Uredi vozilo",
-                empty: "Još nemaš registrirano nijedno vozilo. Klikni \"Dodaj vozilo\" za početak.",
+                empty: 'Još nemaš registrirano nijedno vozilo. Klikni "Dodaj vozilo" za početak.',
                 fetchError: "Neuspješno dohvaćanje vozila: {{detail}}",
                 deleteError: "Brisanje neuspješno: {{detail}}",
                 deleteConfirm: "Sigurno želiš obrisati vozilo {{make}} {{model}} ({{plate}})?",
-                employeeOnly: "Stranica za upravljanje vlastitim vozilima dostupna je samo korisnicima.",
+                employeeOnly:
+                    "Stranica za upravljanje vlastitim vozilima dostupna je samo korisnicima.",
                 fields: {
                     make: "Marka",
                     model: "Model",
@@ -104,7 +105,7 @@ const resources = {
                 empty: "Još nije unesena nijedna usluga.",
                 fetchError: "Neuspješno dohvaćanje usluga: {{detail}}",
                 deleteError: "Brisanje neuspješno: {{detail}}",
-                deleteConfirm: "Sigurno želiš obrisati uslugu \"{{name}}\"?",
+                deleteConfirm: 'Sigurno želiš obrisati uslugu "{{name}}"?',
                 durationMinutes: "{{minutes}} min",
                 priceFormatted: "{{price}} €",
                 fields: {
@@ -169,7 +170,8 @@ const resources = {
                 validation: {
                     kilometersInvalid: "Kilometraža mora biti broj veći ili jednak 0.",
                     descriptionRequired: "Opis problema je obavezan.",
-                    durationExceedsSlot: "Odabrane usluge traju {{total}} min, a odabrani termin traje {{slot}} min. Razmisli o odabiru duljeg termina ili manje usluga.",
+                    durationExceedsSlot:
+                        "Odabrane usluge traju {{total}} min, a odabrani termin traje {{slot}} min. Razmisli o odabiru duljeg termina ili manje usluga.",
                 },
                 wizard: {
                     step1Title: "Odabir termina",
@@ -204,7 +206,8 @@ const resources = {
             appointmentChanges: {
                 proposeAction: "Predloži promjenu termina",
                 proposeTitle: "Predloži novi termin",
-                proposeHint: "Odaberi novi slobodan termin koji ti odgovara. Zaposlenik će prihvatiti ili odbiti zahtjev.",
+                proposeHint:
+                    "Odaberi novi slobodan termin koji ti odgovara. Zaposlenik će prihvatiti ili odbiti zahtjev.",
                 sendRequest: "Pošalji zahtjev",
                 sendingRequest: "Slanje...",
                 requestSent: "Zahtjev za promjenu termina je poslan i čeka obradu.",
@@ -243,7 +246,7 @@ const resources = {
                 },
                 validation: {
                     missingFields: "Sva polja su obavezna.",
-                    timeRangeInvalid: "Vrijeme \"do\" mora biti veće od vremena \"od\".",
+                    timeRangeInvalid: 'Vrijeme "do" mora biti veće od vremena "od".',
                 },
             },
             notifications: {
@@ -347,11 +350,12 @@ const resources = {
                 addAction: "Add vehicle",
                 addTitle: "Add new vehicle",
                 editTitle: "Edit vehicle",
-                empty: "You haven't registered any vehicles yet. Click \"Add vehicle\" to start.",
+                empty: 'You haven\'t registered any vehicles yet. Click "Add vehicle" to start.',
                 fetchError: "Failed to fetch vehicles: {{detail}}",
                 deleteError: "Delete failed: {{detail}}",
                 deleteConfirm: "Delete vehicle {{make}} {{model}} ({{plate}})?",
-                employeeOnly: "The page for managing your own vehicles is available to customers only.",
+                employeeOnly:
+                    "The page for managing your own vehicles is available to customers only.",
                 fields: {
                     make: "Make",
                     model: "Model",
@@ -371,7 +375,7 @@ const resources = {
                 empty: "No services have been added yet.",
                 fetchError: "Failed to fetch services: {{detail}}",
                 deleteError: "Delete failed: {{detail}}",
-                deleteConfirm: "Delete service \"{{name}}\"?",
+                deleteConfirm: 'Delete service "{{name}}"?',
                 durationMinutes: "{{minutes}} min",
                 priceFormatted: "€{{price}}",
                 fields: {
@@ -435,7 +439,8 @@ const resources = {
                 validation: {
                     kilometersInvalid: "Mileage must be a number ≥ 0.",
                     descriptionRequired: "Problem description is required.",
-                    durationExceedsSlot: "Selected services take {{total}} min, but the chosen slot is {{slot}} min. Consider a longer slot or fewer services.",
+                    durationExceedsSlot:
+                        "Selected services take {{total}} min, but the chosen slot is {{slot}} min. Consider a longer slot or fewer services.",
                 },
                 wizard: {
                     step1Title: "Choose appointment",

@@ -5,9 +5,7 @@ import type {
     ReservationCreatePayload,
 } from "../models/reservationTypes";
 
-export function createReservation(
-    payload: ReservationCreatePayload,
-): Promise<Reservation> {
+export function createReservation(payload: ReservationCreatePayload): Promise<Reservation> {
     return httpClient<Reservation>("/reservations", {
         method: "POST",
         body: payload,

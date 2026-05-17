@@ -129,9 +129,7 @@ export function ReservationDetailsPage() {
     const reservationId = Number.parseInt(params.reservationId ?? "", 10);
     const [comment, setComment] = useState("");
 
-    const reservationQuery = useReservationById(
-        Number.isNaN(reservationId) ? null : reservationId,
-    );
+    const reservationQuery = useReservationById(Number.isNaN(reservationId) ? null : reservationId);
     const vehicleQuery = useVehicleById(reservationQuery.data?.IdVozila ?? null);
     const appointmentQuery = useAppointmentById(reservationQuery.data?.IdTermina ?? null);
     const changesQuery = useChangesForReservation(
@@ -168,10 +166,7 @@ export function ReservationDetailsPage() {
             <section className="page">
                 <Alert variant="error">
                     {t("reservations.fetchError", {
-                        detail: getErrorMessage(
-                            reservationQuery.error,
-                            t("common.unknownError"),
-                        ),
+                        detail: getErrorMessage(reservationQuery.error, t("common.unknownError")),
                     })}
                 </Alert>
             </section>
@@ -182,7 +177,8 @@ export function ReservationDetailsPage() {
     const isOwner = user.IdOsobe === reservation.IdOsobe_Korisnik;
     const isEmployee = user.TipKorisnika === "employee";
 
-    const canCancel = isOwner && (reservation.Status === "na cekanju" || reservation.Status === "odobrena");
+    const canCancel =
+        isOwner && (reservation.Status === "na cekanju" || reservation.Status === "odobrena");
     const canApprove = isEmployee && reservation.Status === "na cekanju";
     const canReject = isEmployee && reservation.Status === "na cekanju";
     const canComplete = isEmployee && reservation.Status === "odobrena";
@@ -199,28 +195,17 @@ export function ReservationDetailsPage() {
         0,
     );
 
-    function handleAction(
-        action: "approve" | "reject" | "cancel" | "complete",
-    ): () => void {
+    function handleAction(action: "approve" | "reject" | "cancel" | "complete"): () => void {
         return () => {
             const payload = { komentar: comment.trim() === "" ? null : comment.trim() };
             const onSuccess = () => navigate("/reservations");
             if (action === "approve") {
-                approveMutation.mutate(
-                    { reservationId, payload },
-                    { onSuccess },
-                );
+                approveMutation.mutate({ reservationId, payload }, { onSuccess });
             } else if (action === "reject") {
-                rejectMutation.mutate(
-                    { reservationId, payload },
-                    { onSuccess },
-                );
+                rejectMutation.mutate({ reservationId, payload }, { onSuccess });
             } else if (action === "cancel") {
                 if (!window.confirm(t("reservations.cancelConfirm"))) return;
-                cancelMutation.mutate(
-                    { reservationId, payload },
-                    { onSuccess },
-                );
+                cancelMutation.mutate({ reservationId, payload }, { onSuccess });
             } else if (action === "complete") {
                 completeMutation.mutate(reservationId, { onSuccess });
             }
@@ -241,9 +226,7 @@ export function ReservationDetailsPage() {
     return (
         <section className="page">
             <header className="page__header">
-                <h1>
-                    {t("reservations.detailTitle", { id: reservation.IdRezervacije })}
-                </h1>
+                <h1>{t("reservations.detailTitle", { id: reservation.IdRezervacije })}</h1>
                 <StatusPill status={reservation.Status} />
             </header>
 
@@ -279,10 +262,7 @@ export function ReservationDetailsPage() {
                     <h2>{t("appointmentChanges.relatedTitle")}</h2>
                     <ul className="change-list">
                         {changes.map((change) => (
-                            <ChangeHistoryItem
-                                key={change.IdZahtjevaPromjene}
-                                change={change}
-                            />
+                            <ChangeHistoryItem key={change.IdZahtjevaPromjene} change={change} />
                         ))}
                     </ul>
                 </section>
@@ -322,10 +302,7 @@ export function ReservationDetailsPage() {
 
                     <div className="form-actions">
                         {canApprove ? (
-                            <AppButton
-                                onClick={handleAction("approve")}
-                                disabled={actionInFlight}
-                            >
+                            <AppButton onClick={handleAction("approve")} disabled={actionInFlight}>
                                 {t("reservations.approveAction")}
                             </AppButton>
                         ) : null}
@@ -339,10 +316,7 @@ export function ReservationDetailsPage() {
                             </AppButton>
                         ) : null}
                         {canComplete ? (
-                            <AppButton
-                                onClick={handleAction("complete")}
-                                disabled={actionInFlight}
-                            >
+                            <AppButton onClick={handleAction("complete")} disabled={actionInFlight}>
                                 {t("reservations.completeAction")}
                             </AppButton>
                         ) : null}
@@ -416,9 +390,7 @@ function ReservationSummaryGrid({
             {reservation.services.length > 0 ? (
                 <>
                     <dt>{t("reservations.fields.totalPrice")}</dt>
-                    <dd>
-                        {t("services.priceFormatted", { price: totalPrice.toFixed(2) })}
-                    </dd>
+                    <dd>{t("services.priceFormatted", { price: totalPrice.toFixed(2) })}</dd>
                 </>
             ) : null}
 

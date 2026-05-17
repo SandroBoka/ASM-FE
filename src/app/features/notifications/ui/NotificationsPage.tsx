@@ -2,10 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Alert } from "../../../components/ui/Alert";
 import { useAuth } from "../../auth/hooks/useAuth";
-import {
-    useMarkNotificationAsRead,
-    useNotifications,
-} from "../hooks/useNotifications";
+import { useMarkNotificationAsRead, useNotifications } from "../hooks/useNotifications";
 import type { Notification } from "../models/notificationTypes";
 
 function formatDateTime(value: string): string {
@@ -69,10 +66,7 @@ export function NotificationsPage() {
 
                 {notificationsQuery.isError ? (
                     <Alert variant="error">
-                        {getErrorMessage(
-                            notificationsQuery.error,
-                            t("common.unknownError"),
-                        )}
+                        {getErrorMessage(notificationsQuery.error, t("common.unknownError"))}
                     </Alert>
                 ) : null}
 
@@ -86,9 +80,7 @@ export function NotificationsPage() {
                             <li
                                 key={notification.IdObavijesti}
                                 className={`notification-list__item ${
-                                    notification.Procitana
-                                        ? ""
-                                        : "notification-list__item--unread"
+                                    notification.Procitana ? "" : "notification-list__item--unread"
                                 }`}
                                 onClick={() => handleClick(notification)}
                             >

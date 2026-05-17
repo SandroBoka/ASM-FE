@@ -41,9 +41,7 @@ export function useReservationById(reservationId: number | null | undefined) {
     });
 }
 
-function invalidateReservationsAndAppointments(
-    queryClient: ReturnType<typeof useQueryClient>,
-) {
+function invalidateReservationsAndAppointments(queryClient: ReturnType<typeof useQueryClient>) {
     queryClient.invalidateQueries({ queryKey: [RESERVATIONS_QUERY_KEY] });
     queryClient.invalidateQueries({ queryKey: [APPOINTMENTS_QUERY_KEY] });
 }

@@ -1,9 +1,5 @@
 import { httpClient } from "../../../api/httpClient";
-import type {
-    Service,
-    ServiceCreatePayload,
-    ServiceUpdatePayload,
-} from "../models/serviceTypes";
+import type { Service, ServiceCreatePayload, ServiceUpdatePayload } from "../models/serviceTypes";
 
 export function getServices(search?: string): Promise<Service[]> {
     const query = search ? `?search=${encodeURIComponent(search)}` : "";
@@ -21,10 +17,7 @@ export function createService(payload: ServiceCreatePayload): Promise<Service> {
     });
 }
 
-export function updateService(
-    serviceId: number,
-    payload: ServiceUpdatePayload,
-): Promise<Service> {
+export function updateService(serviceId: number, payload: ServiceUpdatePayload): Promise<Service> {
     return httpClient<Service>(`/services/${serviceId}`, {
         method: "PUT",
         body: payload,

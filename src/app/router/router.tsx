@@ -41,9 +41,7 @@ export const router = createBrowserRouter([
                     { path: "services", element: <ServicesPage /> },
                     {
                         element: <ProtectedRoute requiredUserType="customer" />,
-                        children: [
-                            { path: "notifications", element: <NotificationsPage /> },
-                        ],
+                        children: [{ path: "notifications", element: <NotificationsPage /> }],
                     },
                     { path: "vehicles", element: <VehiclesPage /> },
                     { path: "reservations", element: <ReservationsPage /> },

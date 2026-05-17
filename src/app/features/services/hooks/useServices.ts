@@ -1,10 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as servicesApi from "../api/servicesApi";
-import type {
-    Service,
-    ServiceCreatePayload,
-    ServiceUpdatePayload,
-} from "../models/serviceTypes";
+import type { Service, ServiceCreatePayload, ServiceUpdatePayload } from "../models/serviceTypes";
 
 const SERVICES_QUERY_KEY = "services";
 
@@ -38,14 +34,10 @@ export function useUpdateService() {
     const queryClient = useQueryClient();
 
     return useMutation<Service, Error, { serviceId: number; payload: ServiceUpdatePayload }>({
-        mutationFn: ({ serviceId, payload }) =>
-            servicesApi.updateService(serviceId, payload),
+        mutationFn: ({ serviceId, payload }) => servicesApi.updateService(serviceId, payload),
         onSuccess: (service) => {
             queryClient.invalidateQueries({ queryKey: [SERVICES_QUERY_KEY] });
-            queryClient.setQueryData(
-                [SERVICES_QUERY_KEY, "detail", service.IdUsluge],
-                service,
-            );
+            queryClient.setQueryData([SERVICES_QUERY_KEY, "detail", service.IdUsluge], service);
         },
     });
 }

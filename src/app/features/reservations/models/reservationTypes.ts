@@ -1,11 +1,6 @@
 import type { Service } from "../../services/models/serviceTypes";
 
-export type ReservationStatus =
-    | "na cekanju"
-    | "odobrena"
-    | "odbijena"
-    | "otkazana"
-    | "zavrsena";
+export type ReservationStatus = "na cekanju" | "odobrena" | "odbijena" | "otkazana" | "zavrsena";
 
 export type ReservationServiceItem = {
     Kolicina: number;
